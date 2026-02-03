@@ -3,7 +3,6 @@ import useLenis from '@/hooks/useLenis';
 import NoiseOverlay from '@/components/NoiseOverlay';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import ScrollProgress from '@/components/ScrollProgress';
-import MagneticCursor from '@/components/MagneticCursor';
 import HeroSection from '@/components/HeroSection';
 import IntroSection from '@/components/IntroSection';
 import SkillsSection from '@/components/SkillsSection';
@@ -21,10 +20,7 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="relative text-foreground font-mono scrollbar-hide cursor-none md:cursor-none">
-      {/* Custom magnetic cursor */}
-      <MagneticCursor />
-      
+    <main className="relative text-foreground font-mono scrollbar-hide">
       {/* Animated abstract background */}
       <AnimatedBackground />
       
