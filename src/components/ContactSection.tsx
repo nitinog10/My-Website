@@ -119,10 +119,10 @@ const ContactSection = () => {
                 <div>
                   <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">PHONE</span>
                   <a
-                    href="tel:+917489078947"
+                    href="tel:+0000000000"
                     className="text-base md:text-lg text-muted-foreground hover:text-accent transition-colors duration-300"
                   >
-                    +91 7489078947
+                    +91 000000000
                   </a>
                 </div>
               </div>
