@@ -92,7 +92,7 @@ const TechStackSection = () => {
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">008</span>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">006</span>
             <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">STACK</span>
           </motion.div>
 

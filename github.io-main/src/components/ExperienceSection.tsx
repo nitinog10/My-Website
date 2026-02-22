@@ -101,7 +101,7 @@ const ExperienceCard = ({ exp, index, isLast }: { exp: typeof experiences[0]; in
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-xl p-6 md:p-8 transition-all duration-300 ease-out cursor-default"
+            className="group relative rounded-xl p-4 md:p-6 transition-all duration-300 ease-out cursor-default"
             style={{
               rotateX,
               rotateY,
@@ -134,17 +134,17 @@ const ExperienceCard = ({ exp, index, isLast }: { exp: typeof experiences[0]; in
             </div>
 
             {/* Role */}
-            <h3 className="text-lg md:text-xl font-bold text-white uppercase tracking-tight mb-2" style={{ transform: 'translateZ(20px)' }}>
+            <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight mb-1" style={{ transform: 'translateZ(20px)' }}>
               {exp.role}
             </h3>
 
             {/* Company */}
-            <span className="text-sm text-accent tracking-[0.1em] uppercase block mb-4" style={{ transform: 'translateZ(15px)' }}>
+            <span className="text-xs text-accent tracking-[0.1em] uppercase block mb-3" style={{ transform: 'translateZ(15px)' }}>
               @{exp.company}
             </span>
 
             {/* Description */}
-            <p className="text-sm text-white/50 leading-relaxed" style={{ transform: 'translateZ(10px)' }}>
+            <p className="text-xs text-white/50 leading-relaxed" style={{ transform: 'translateZ(10px)' }}>
               {exp.description}
             </p>
           </motion.div>
@@ -169,7 +169,7 @@ const ExperienceSection = () => {
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">005</span>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">004</span>
             <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">JOURNEY</span>
           </motion.div>
 
@@ -189,14 +189,6 @@ const ExperienceSection = () => {
 
         {/* Timeline with cards */}
         <div className="relative">
-          {/* Center timeline line */}
-          <div
-            className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 hidden md:block"
-            style={{
-              background: 'linear-gradient(to bottom, transparent, rgba(255,255,255,0.1) 10%, rgba(255,255,255,0.1) 90%, transparent)'
-            }}
-          />
-
           {/* Experience cards */}
           <div>
             {experiences.map((exp, index) => (

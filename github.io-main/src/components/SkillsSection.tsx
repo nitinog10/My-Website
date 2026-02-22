@@ -86,7 +86,7 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-xl p-6 md:p-8 transition-all duration-300 ease-out"
+            className="group relative rounded-xl p-4 md:p-6 transition-all duration-300 ease-out"
             style={{
               rotateX,
               rotateY,
@@ -108,18 +108,18 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
             />
             
             {/* Category header */}
-            <div className="flex items-center gap-3 mb-6" style={{ transform: 'translateZ(20px)' }}>
-              <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_rgba(0,255,200,0.5)]" />
-              <h3 className="text-sm md:text-base font-semibold text-accent uppercase tracking-[0.15em]">
+            <div className="flex items-center gap-2 mb-4" style={{ transform: 'translateZ(20px)' }}>
+              <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(0,255,200,0.5)]" />
+              <h3 className="text-xs md:text-sm font-semibold text-accent uppercase tracking-[0.15em]">
                 {group.category}
               </h3>
             </div>
 
             {/* Skills list */}
-            <div className="space-y-3" style={{ transform: 'translateZ(10px)' }}>
+            <div className="space-y-2" style={{ transform: 'translateZ(10px)' }}>
               {group.skills.map((skill) => (
                 <div key={skill} className="group/skill">
-                  <span className="text-sm text-white/60 group-hover/skill:text-white/90 transition-colors duration-300 leading-relaxed block">
+                  <span className="text-xs text-white/60 group-hover/skill:text-white/90 transition-colors duration-300 leading-relaxed block">
                     {skill}
                   </span>
                 </div>

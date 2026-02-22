@@ -32,20 +32,19 @@ const recognitions = [
   },
 ];
 
-// 3D Recognition card
+// 3D Recognition card with timeline layout
 const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const isLeft = index % 2 === 0;
   
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start end", "end start"]
   });
   
-  const isFromLeft = index % 2 === 0;
-  const xOffset = isFromLeft ? -80 : 80;
-  
+  const xOffset = isLeft ? -80 : 80;
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
   const x = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [xOffset, 0, 0, -xOffset]);
   const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
@@ -65,75 +64,92 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
   };
 
   return (
-    <motion.div
-      ref={cardRef}
-      className="group"
-      style={{ opacity, x, scale }}
-    >
-      <div className={`grid grid-cols-12 gap-6 md:gap-10 items-center ${index % 2 === 1 ? 'md:flex-row-reverse' : ''}`}>
-        {/* Image */}
-        <motion.div 
-          className={`col-span-12 md:col-span-5 ${index % 2 === 1 ? 'md:col-start-8' : ''}`}
+    <div ref={cardRef} className="relative">
+      {/* Timeline point */}
+      <motion.div
+        className="absolute left-1/2 top-10 -translate-x-1/2 z-10 hidden md:flex items-center justify-center"
+        style={{ opacity }}
+      >
+        <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,255,200,0.6)]" />
+      </motion.div>
+
+      {/* Card container - alternating sides */}
+      <div className={`flex ${isLeft ? 'md:justify-start' : 'md:justify-end'} justify-center`}>
+        <motion.div
+          className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
+          style={{ opacity, x, scale }}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
         >
+          {/* Connector line */}
+          <div
+            className={`absolute top-12 ${isLeft ? 'right-0' : 'left-0'} w-12 h-px hidden md:block`}
+            style={{
+              background: isLeft 
+                ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.3))' 
+                : 'linear-gradient(to left, transparent, rgba(0,255,200,0.3))'
+            }}
+          />
+
+          {/* Card */}
           <motion.div
-            className="relative overflow-hidden rounded-xl"
+            className="group relative rounded-xl overflow-hidden transition-all duration-300 ease-out"
             style={{
               rotateX,
               rotateY,
               transformStyle: 'preserve-3d',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
             }}
             whileHover={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.5)'
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.1)'
             }}
           >
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full h-40 md:h-48 object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            {/* Achievement image */}
+            <div className="relative">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-28 md:h-32 object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            </div>
+
+            {/* Content */}
+            <div className="p-4 md:p-5">
+              {/* Category badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3"
+                style={{ 
+                  background: 'rgba(0,255,200,0.08)', 
+                  border: '1px solid rgba(0,255,200,0.15)'
+                }}>
+                <div className="w-1.5 h-1.5 rounded-full bg-accent" />
+                <span className="text-[10px] tracking-[0.12em] text-accent uppercase font-medium">
+                  {item.category}
+                </span>
+              </div>
+              
+              {/* Title */}
+              <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight mb-1 group-hover:text-accent transition-colors duration-300">
+                {item.title}
+              </h3>
+              
+              {/* Description */}
+              <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">
+                {item.description}
+              </p>
+              
+              {/* Year */}
+              <span className="text-[10px] text-white/30 uppercase tracking-[0.15em]">
+                {item.year}
+              </span>
+            </div>
           </motion.div>
         </motion.div>
-
-        {/* Content */}
-        <div className={`col-span-12 md:col-span-6 ${index % 2 === 1 ? 'md:col-start-1 md:row-start-1 md:text-right' : ''}`}>
-          {/* Index */}
-          <span className="text-[clamp(2rem,5vw,3.5rem)] font-bold text-white/5 leading-none block mb-2">
-            0{index + 1}
-          </span>
-          
-          {/* Category badge */}
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4 ${index % 2 === 1 ? 'md:ml-auto' : ''}`}
-            style={{ 
-              background: 'rgba(0,255,200,0.08)', 
-              border: '1px solid rgba(0,255,200,0.15)'
-            }}>
-            <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] tracking-[0.12em] text-accent uppercase font-medium">
-              {item.category}
-            </span>
-          </div>
-          
-          {/* Title */}
-          <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white uppercase tracking-tight mb-3 group-hover:text-accent transition-colors duration-300">
-            {item.title}
-          </h3>
-          
-          {/* Description */}
-          <p className={`text-sm text-white/50 leading-relaxed mb-4 max-w-md ${index % 2 === 1 ? 'md:ml-auto' : ''}`}>
-            {item.description}
-          </p>
-          
-          {/* Year */}
-          <span className="text-xs text-white/30 uppercase tracking-[0.15em]">
-            {item.year}
-          </span>
-        </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -152,7 +168,7 @@ const RecognitionSection = () => {
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">006</span>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">005</span>
             <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">RECOGNITION</span>
           </motion.div>
 
@@ -171,7 +187,7 @@ const RecognitionSection = () => {
         </div>
 
         {/* Recognition items */}
-        <div className="space-y-20 md:space-y-32">
+        <div className="space-y-12 md:space-y-16">
           {recognitions.map((item, index) => (
             <RecognitionCard key={item.title} item={item} index={index} />
           ))}
