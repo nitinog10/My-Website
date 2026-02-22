@@ -36,11 +36,24 @@ const Index = () => {
       {/* Main content after hero transition */}
       <div className="relative z-10">
         <IntroSection />
-        <SkillsSection />
+        
+        {/* Main sections with continuous center timeline */}
+        <div className="relative">
+          {/* Continuous center line running through all major sections */}
+          <div 
+            className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 hidden md:block pointer-events-none z-0"
+            style={{
+              background: 'linear-gradient(to bottom, transparent, rgba(0,255,200,0.15) 5%, rgba(0,255,200,0.15) 95%, transparent)'
+            }}
+          />
+          
+          <SkillsSection />
+          <ProjectsSection />
+          <ExperienceSection />
+          <RecognitionSection />
+        </div>
+        
         <TechStackSection />
-        <RecognitionSection />
-        <ExperienceSection />
-        <ProjectsSection />
         <ContactSection />
       </div>
     </main>

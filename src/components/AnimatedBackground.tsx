@@ -1,61 +1,29 @@
-import { ShaderGradientCanvas, ShaderGradient } from 'shadergradient';
-
 const AnimatedBackground = () => {
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
-      <ShaderGradientCanvas
+      {/* Base dark gradient */}
+      <div 
+        className="absolute inset-0"
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
+          background: 'linear-gradient(135deg, #0a0a0f 0%, #0d0d18 25%, #0a0a12 50%, #080810 75%, #050508 100%)'
         }}
-      >
-<ShaderGradient
-  animate="on"
-  axesHelper="on"
-  bgColor1="#000000"
-  bgColor2="#000000"
-  brightness={1.1}
-  cAzimuthAngle={180}
-  cDistance={3.71}
-  cPolarAngle={115}
-  cameraZoom={1}
-  color1="#03082e"
-  color2="#000093"
-  color3="#070038"
-  destination="onCanvas"
-  embedMode="off"
-  envPreset="city"
-  format="gif"
-  fov={40}
-  frameRate={10}
-  gizmoHelper="hide"
-  grain="off"
-  lightType="3d"
-  pixelDensity={1}
-  positionX={-0.5}
-  positionY={0.1}
-  positionZ={0}
-  range="disabled"
-  rangeEnd={40}
-  rangeStart={24.6}
-  reflection={0.1}
-  rotationX={0}
-  rotationY={0}
-  rotationZ={235}
-  shader="defaults"
-  type="waterPlane"
-  uAmplitude={0}
-  uDensity={1.1}
-  uFrequency={5.5}
-  uSpeed={0.4}
-  uStrength={2.4}
-  uTime={24.6}
-  wireframe={false}
-/>
-      </ShaderGradientCanvas>
+      />
+      
+      {/* Subtle radial glow */}
+      <div 
+        className="absolute inset-0 opacity-40"
+        style={{
+          background: 'radial-gradient(ellipse at 30% 20%, rgba(20, 30, 60, 0.4) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(30, 20, 50, 0.3) 0%, transparent 50%)'
+        }}
+      />
+      
+      {/* Very subtle noise texture */}
+      <div 
+        className="absolute inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`
+        }}
+      />
     </div>
   );
 };
