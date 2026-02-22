@@ -111,12 +111,14 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
             <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent z-10" />
             
             {/* Achievement image */}
-            <div className="relative bg-gradient-to-b from-white/5 to-transparent">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-40 md:h-48 object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-              />
+            <div className="relative">
+              <div className="w-full aspect-video bg-black/20 overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
             </div>
 
             {/* Content */}

@@ -123,12 +123,14 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
             <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent z-10" />
             
             {/* Project image */}
-            <a href={project.github} target="_blank" rel="noopener noreferrer" className="block relative bg-gradient-to-b from-white/5 to-transparent">
-              <img
-                src={project.image}
-                alt={project.name}
-                className="w-full h-44 md:h-52 object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-              />
+            <a href={project.github} target="_blank" rel="noopener noreferrer" className="block relative">
+              <div className="w-full aspect-video bg-black/20 overflow-hidden">
+                <img
+                  src={project.image}
+                  alt={project.name}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
               
               {/* View project overlay */}
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
