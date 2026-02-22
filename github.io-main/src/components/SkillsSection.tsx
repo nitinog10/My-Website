@@ -86,40 +86,38 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-xl p-4 md:p-6 transition-all duration-300 ease-out"
+            className="group relative rounded-2xl p-5 md:p-6 transition-all duration-300 ease-out overflow-hidden"
             style={{
               rotateX,
               rotateY,
               transformStyle: 'preserve-3d',
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+              background: 'rgba(17, 17, 20, 0.9)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
             }}
             whileHover={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)'
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.12)'
             }}
           >
-            {/* Glow effect */}
-            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle at 50% 0%, rgba(0,255,200,0.08) 0%, transparent 60%)'
-              }}
-            />
+            {/* Top accent border */}
+            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
+            
+            {/* Index number */}
+            <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              0{index + 1}
+            </span>
             
             {/* Category header */}
-            <div className="flex items-center gap-2 mb-4" style={{ transform: 'translateZ(20px)' }}>
-              <div className="w-1.5 h-1.5 rounded-full bg-accent shadow-[0_0_10px_rgba(0,255,200,0.5)]" />
-              <h3 className="text-xs md:text-sm font-semibold text-accent uppercase tracking-[0.15em]">
-                {group.category}
-              </h3>
-            </div>
+            <h3 className="text-lg md:text-xl font-bold text-white mb-3 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+              {group.category.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+            </h3>
 
             {/* Skills list */}
             <div className="space-y-2" style={{ transform: 'translateZ(10px)' }}>
               {group.skills.map((skill) => (
                 <div key={skill} className="group/skill">
-                  <span className="text-xs text-white/60 group-hover/skill:text-white/90 transition-colors duration-300 leading-relaxed block">
+                  <span className="text-sm text-white/50 group-hover/skill:text-white/80 transition-colors duration-300 leading-relaxed block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                     {skill}
                   </span>
                 </div>

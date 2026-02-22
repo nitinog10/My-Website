@@ -93,58 +93,54 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-xl overflow-hidden transition-all duration-300 ease-out"
+            className="group relative rounded-2xl overflow-hidden transition-all duration-300 ease-out"
             style={{
               rotateX,
               rotateY,
               transformStyle: 'preserve-3d',
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+              background: 'rgba(17, 17, 20, 0.9)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
             }}
             whileHover={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)'
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.12)'
             }}
           >
+            {/* Top accent border */}
+            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent z-10" />
+            
             {/* Achievement image */}
-            <div className="relative bg-black/30">
+            <div className="relative bg-gradient-to-b from-white/5 to-transparent">
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full h-36 md:h-44 object-contain transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-40 md:h-48 object-contain p-4 transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
             </div>
 
             {/* Content */}
-            <div className="p-4 md:p-5">
-              {/* Category badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3"
-                style={{ 
-                  background: 'rgba(0,255,200,0.08)', 
-                  border: '1px solid rgba(0,255,200,0.15)'
-                }}>
-                <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                <span className="text-[10px] tracking-[0.12em] text-accent uppercase font-medium">
+            <div className="p-5 md:p-6">
+              {/* Category & Year */}
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-accent text-xs font-medium tracking-wider" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                   {item.category}
+                </span>
+                <span className="text-white/30">·</span>
+                <span className="text-white/30 text-xs" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  {item.year}
                 </span>
               </div>
               
               {/* Title */}
-              <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight mb-1 group-hover:text-accent transition-colors duration-300">
-                {item.title}
+              <h3 className="text-lg md:text-xl font-bold text-white mb-3 group-hover:text-accent transition-colors duration-300" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                {item.title.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
               </h3>
               
               {/* Description */}
-              <p className="text-xs text-white/50 leading-relaxed mb-2 line-clamp-2">
+              <p className="text-sm text-white/50 leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                 {item.description}
               </p>
-              
-              {/* Year */}
-              <span className="text-[10px] text-white/30 uppercase tracking-[0.15em]">
-                {item.year}
-              </span>
             </div>
           </motion.div>
         </motion.div>

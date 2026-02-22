@@ -101,50 +101,40 @@ const ExperienceCard = ({ exp, index, isLast }: { exp: typeof experiences[0]; in
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-xl p-4 md:p-6 transition-all duration-300 ease-out cursor-default"
+            className="group relative rounded-2xl p-5 md:p-6 transition-all duration-300 ease-out cursor-default overflow-hidden"
             style={{
               rotateX,
               rotateY,
               transformStyle: 'preserve-3d',
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-              border: '1px solid rgba(255,255,255,0.06)',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+              background: 'rgba(17, 17, 20, 0.9)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
             }}
             whileHover={{
-              boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.1)'
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.12)'
             }}
           >
-            {/* Glow effect */}
-            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-              style={{ background: 'radial-gradient(circle at 50% 0%, rgba(0,255,200,0.08) 0%, transparent 60%)' }}
-            />
+            {/* Top accent border */}
+            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
 
-            {/* Period badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-4" 
-              style={{ 
-                background: 'rgba(0,255,200,0.08)', 
-                border: '1px solid rgba(0,255,200,0.15)',
-                transform: 'translateZ(15px)'
-              }}>
-              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-              <span className="text-[10px] md:text-xs tracking-[0.12em] text-accent uppercase font-medium">
-                {exp.period}
-              </span>
-            </div>
+            {/* Period */}
+            <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              {exp.period}
+            </span>
 
             {/* Role */}
-            <h3 className="text-base md:text-lg font-bold text-white uppercase tracking-tight mb-1" style={{ transform: 'translateZ(20px)' }}>
-              {exp.role}
+            <h3 className="text-lg md:text-xl font-bold text-white mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+              {exp.role.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
             </h3>
 
             {/* Company */}
-            <span className="text-xs text-accent tracking-[0.1em] uppercase block mb-3" style={{ transform: 'translateZ(15px)' }}>
-              @{exp.company}
+            <span className="text-sm text-accent font-medium block mb-4" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(15px)' }}>
+              @{exp.company.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
             </span>
 
             {/* Description */}
-            <p className="text-xs text-white/50 leading-relaxed" style={{ transform: 'translateZ(10px)' }}>
+            <p className="text-sm text-white/50 leading-relaxed" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
               {exp.description}
             </p>
           </motion.div>
