@@ -65,7 +65,15 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
           >
-            LET'S BUILD
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2em', lineHeight: 1 }}>
+              LET'S
+              <img
+                src="/pepe.png"
+                alt="pepe"
+                style={{ height: '0.9em', width: 'auto', borderRadius: '0.12em', display: 'inline-block' }}
+              />
+              BUILD
+            </span>
             <br />
             <span className="text-accent">TOGETHER</span>
           </motion.h1>

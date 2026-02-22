@@ -3,28 +3,12 @@ import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
 const projects = [
   {
-    name: 'BHARATTRIPAI',
-    description: 'Smart AI-based travel companion for India. An intelligent platform that helps travelers explore India with personalized recommendations and insights.',
-    stack: 'AI · Travel · Python · NLP',
-    company: 'AI TRAVEL',
-    image: '/Bharattripai.png',
-    github: 'https://github.com/nitinog10/Beta-20-.git'
-  },
-  {
-    name: 'LEARNING MANAGEMENT SYSTEM',
-    description: 'A comprehensive platform for managing courses, students, and educational content with modern features.',
-    stack: 'Full Stack · Education · React',
-    company: 'EDTECH',
-    image: '/learning management system.png',
-    github: 'https://github.com/nitinog10/Learning-management-system.git'
-  },
-  {
-    name: 'CAMPUS MITRA',
-    description: 'RAG-powered AI chat platform for campus assistance. Helps students with queries using retrieval-augmented generation.',
-    stack: 'RAG · LLM · AI Chat · Python',
-    company: 'AI ASSISTANT',
-    image: '/campusmitra.png',
-    github: 'https://github.com/nitinog10/Campus-mitra.git'
+    name: 'ATMOPREDICT',
+    description: 'NASA Space Apps Challenge winning project. Weather prediction model using historical climate data for accurate forecasting and environmental analysis.',
+    stack: 'Machine Learning · Python · Earth Observation Data',
+    company: 'NASA SPACE APPS — WINNER',
+    image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80',
+    github: 'https://github.com/nitinog10/AtmoPredict.git'
   },
   {
     name: 'AIRPULSE',
@@ -35,12 +19,28 @@ const projects = [
     github: 'https://github.com/nitinog10/air-pulse.git'
   },
   {
-    name: 'ATMOPREDICT',
-    description: 'NASA Space Apps Challenge winning project. Weather prediction model using historical climate data for accurate forecasting and environmental analysis.',
-    stack: 'Machine Learning · Python · Earth Observation Data',
-    company: 'NASA SPACE APPS — WINNER',
-    image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&q=80',
-    github: 'https://github.com/nitinog10/AtmoPredict.git'
+    name: 'CAMPUS MITRA',
+    description: 'RAG-powered AI chat platform for campus assistance. Helps students with queries using retrieval-augmented generation.',
+    stack: 'RAG · LLM · AI Chat · Python',
+    company: 'AI ASSISTANT',
+    image: '/campusmitra.png',
+    github: 'https://github.com/nitinog10/Campus-mitra.git'
+  },
+  {
+    name: 'LEARNING MANAGEMENT SYSTEM',
+    description: 'A comprehensive platform for managing courses, students, and educational content with modern features.',
+    stack: 'Full Stack · Education · React',
+    company: 'EDTECH',
+    image: '/learning management system.png',
+    github: 'https://github.com/nitinog10/Learning-management-system.git'
+  },
+  {
+    name: 'BHARATTRIPAI',
+    description: 'Smart AI-based travel companion for India. An intelligent platform that helps travelers explore India with personalized recommendations and insights.',
+    stack: 'AI · Travel · Python · NLP',
+    company: 'AI TRAVEL',
+    image: '/Bharattripai.png',
+    github: 'https://github.com/nitinog10/Beta-20-.git'
   }
 ];
 
@@ -203,16 +203,27 @@ const ProjectsSection = () => {
           </motion.div>
           
           <div className="col-span-12 md:col-span-10 md:col-start-3">
-            <motion.h2
-              className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
-              style={{ fontFamily: 'var(--font-heading)' }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            >
-              SELECTED<br />
-              <span className="text-white/20">PROJECTS</span>
-            </motion.h2>
+            <div className="flex items-center gap-6">
+              <motion.h2
+                className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                SELECTED<br />
+                <span className="text-white/20">PROJECTS</span>
+              </motion.h2>
+              <motion.img
+                src="/projects.png"
+                alt="projects"
+                className="hidden md:block flex-shrink-0"
+                style={{ height: 'clamp(100px, 13vw, 180px)', width: 'auto', opacity: 0.9, borderRadius: '12px' }}
+                initial={{ opacity: 0, x: 30 }}
+                animate={isInView ? { opacity: 0.9, x: 0 } : { opacity: 0, x: 30 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
           </div>
         </div>
 

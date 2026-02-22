@@ -1,152 +1,287 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { SiGithub, SiLinkedin, SiInstagram, SiX } from 'react-icons/si';
+import { MdEmail } from 'react-icons/md';
+
+const socials = [
+  {
+    icon: SiLinkedin,
+    label: 'LinkedIn',
+    handle: 'nitin-kumar-mishra',
+    href: 'https://www.linkedin.com/in/nitin-kumar-mishra-520615331',
+    color: '#0A66C2'
+  },
+  {
+    icon: SiGithub,
+    label: 'GitHub',
+    handle: '@nitinog10',
+    href: 'https://github.com/nitinog10',
+    color: '#ffffff'
+  },
+  {
+    icon: MdEmail,
+    label: 'Email',
+    handle: 'nitiniszod10@gmail.com',
+    href: 'mailto:nitiniszod10@gmail.com',
+    color: '#EA4335'
+  },
+  {
+    icon: SiInstagram,
+    label: 'Instagram',
+    handle: '@nitinn10_',
+    href: 'https://instagram.com/nitinn10_',
+    color: '#E1306C'
+  },
+  {
+    icon: SiX,
+    label: 'Twitter / X',
+    handle: '@nitinog10',
+    href: 'https://x.com/nitinog10',
+    color: '#ffffff'
+  },
+];
 
 const ContactSection = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: false, margin: "-20%" });
-  
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-  
-  // Enter from RIGHT, exit to LEFT
-  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
-  const x = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [100, 0, 0, -100]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.95, 1, 1, 0.95]);
-  const rotateY = useTransform(scrollYProgress, [0, 0.35, 0.65, 1], [8, 0, 0, -8]);
+  const isInView = useInView(ref, { once: false, margin: "-10%" });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [sent, setSent] = useState(false);
+
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mailto = `mailto:nitiniszod10@gmail.com?subject=Message from ${formData.name}&body=${encodeURIComponent(formData.message + '\n\nFrom: ' + formData.email)}`;
+    window.open(mailto);
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+  };
 
   return (
-    <motion.section 
-      ref={ref} 
-      className="section-full bg-background/20 backdrop-blur-sm py-32 md:py-48 min-h-screen flex items-center overflow-hidden"
-      style={{ opacity, x, scale, rotateY, transformPerspective: 1200 }}
+    <motion.section
+      ref={ref}
+      className="py-32 md:py-48 overflow-hidden"
+      style={{ opacity }}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-        <div className="grid grid-cols-12 gap-4">
-          {/* Section indicator */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Section header */}
+        <div className="grid grid-cols-12 gap-4 mb-16">
           <motion.div
             className="col-span-12 md:col-span-2"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/50 uppercase">007</span>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">007</span>
             <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">CONTACT</span>
           </motion.div>
-
-          {/* Main content */}
           <div className="col-span-12 md:col-span-10 md:col-start-3">
-            {/* Large CTA */}
             <motion.h2
-              className="text-[clamp(3rem,12vw,10rem)] font-bold text-primary uppercase tracking-tighter leading-[0.85] mb-16"
-              style={{ fontFamily: 'var(--font-heading)' }}
-              initial={{ opacity: 0, y: 40 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
+              style={{ fontFamily: 'Inter, system-ui, sans-serif', overflow: 'visible' }}
+              initial={{ opacity: 0, y: 30 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             >
-              LET'S BUILD
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25em', lineHeight: 1 }}>
+                LET'S BUILD
+              </span>
               <br />
               <span className="text-accent">THE FUTURE</span>
             </motion.h2>
-
-            {/* Contact details - asymmetric */}
-            <motion.div
-              className="md:ml-[20%] space-y-12"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            >
-              {/* Email */}
-              <div>
-                <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">EMAIL</span>
-                <a
-                  href="mailto:nitiniszod10@gmail.com"
-                  className="text-xl md:text-3xl lg:text-4xl text-primary hover:text-accent transition-colors duration-300 tracking-tight"
-                  style={{ fontFamily: 'var(--font-heading)' }}
-                >
-                  nitiniszod10@gmail.com
-                </a>
-              </div>
-
-              {/* Links */}
-              <div className="flex flex-col md:flex-row gap-8 md:gap-16">
-                <div>
-                  <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">LINKEDIN</span>
-                  <a
-                    href="https://www.linkedin.com/in/nitin-kumar-mishra-520615331"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-base md:text-lg text-muted-foreground hover:text-accent transition-colors duration-300 inline-flex items-center gap-2"
-                  >
-                    <span>Connect</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </a>
-                </div>
-
-                <div>
-                  <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">GITHUB</span>
-                  <a
-                    href="https://github.com/nitinog10"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-base md:text-lg text-muted-foreground hover:text-accent transition-colors duration-300 inline-flex items-center gap-2"
-                  >
-                    <span>@nitinog10</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </a>
-                </div>
-
-                <div>
-                  <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">RESUME</span>
-                  <a
-                    href="/Nitin_Kumar_Mishra_AI_Resume.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-base md:text-lg text-muted-foreground hover:text-accent transition-colors duration-300 inline-flex items-center gap-2"
-                  >
-                    <span>Download</span>
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
-                    </svg>
-                  </a>
-                </div>
-                
-                <div>
-                  <span className="text-xs md:text-sm tracking-[0.2em] text-muted-foreground/40 uppercase block mb-3">PHONE</span>
-                  <a
-                    href="tel:+0000000000"
-                    className="text-base md:text-lg text-muted-foreground hover:text-accent transition-colors duration-300"
-                  >
-                    +91 000000000
-                  </a>
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Footer - at the bottom */}
-            <motion.div
-              className="mt-32 md:mt-48 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
-              initial={{ opacity: 0 }}
-              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-            >
-              <span className="text-[10px] text-muted-foreground/30 uppercase tracking-[0.3em]">
-                © 2026 NITIN MISHRA
-              </span>
-              <span className="text-[10px] text-muted-foreground/30 uppercase tracking-[0.3em]">
-                BHOPAL, INDIA
-              </span>
-            </motion.div>
           </div>
         </div>
+
+        {/* Two column layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+          {/* LEFT — Contact form box */}
+          <motion.div
+            initial={{ opacity: 0, x: -60 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -60 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+          >
+            <div
+              className="rounded-2xl p-6 md:p-8 h-full relative overflow-hidden"
+              style={{
+                background: 'rgba(17,17,20,0.9)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
+              }}
+            >
+              {/* Top accent border */}
+              <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
+
+              <h3 className="text-xl font-bold text-white mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Send a Message
+              </h3>
+              <p className="text-sm text-white/40 mb-6" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Have a project in mind? Let's talk.
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="text-xs text-white/40 uppercase tracking-wider block mb-1.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your name"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all duration-300 focus:border-accent/50"
+                    style={{
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 uppercase tracking-wider block mb-1.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none transition-all duration-300 focus:border-accent/50"
+                    style={{
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)'
+                    }}
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 uppercase tracking-wider block mb-1.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Message</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={formData.message}
+                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                    placeholder="Tell me about your project..."
+                    className="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-white/20 outline-none resize-none transition-all duration-300 focus:border-accent/50"
+                    style={{
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)'
+                    }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl text-sm font-semibold text-black transition-all duration-300 hover:brightness-110 active:scale-95"
+                  style={{
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    background: 'rgba(0,255,200,1)'
+                  }}
+                >
+                  {sent ? '✓ Message Sent!' : 'Send Message →'}
+                </button>
+              </form>
+            </div>
+          </motion.div>
+
+          {/* RIGHT — Social links */}
+          <motion.div
+            initial={{ opacity: 0, x: 60 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 60 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
+            className="flex flex-col gap-4"
+          >
+            {socials.map((social, index) => (
+              <motion.a
+                key={social.label}
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-4 rounded-2xl p-4 md:p-5 transition-all duration-300 relative overflow-hidden"
+                style={{
+                  background: 'rgba(17,17,20,0.9)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                  textDecoration: 'none'
+                }}
+                whileHover={{
+                  border: `1px solid ${social.color}40`,
+                  boxShadow: `0 8px 32px ${social.color}15`
+                }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.5, delay: 0.3 + index * 0.08 }}
+              >
+                {/* Icon */}
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                  style={{ background: `${social.color}15`, border: `1px solid ${social.color}25` }}
+                >
+                  <social.icon
+                    className="w-5 h-5 transition-all duration-300"
+                    style={{ color: social.color }}
+                  />
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <span className="text-xs text-white/30 uppercase tracking-wider block mb-0.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    {social.label}
+                  </span>
+                  <span className="text-sm text-white/70 group-hover:text-white transition-colors duration-300 truncate block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    {social.handle}
+                  </span>
+                </div>
+
+                {/* Arrow */}
+                <svg className="w-4 h-4 text-white/20 group-hover:text-accent transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </motion.a>
+            ))}
+
+            {/* Resume download */}
+            <motion.a
+              href="/Nitin_Kumar_Mishra_AI_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center justify-center gap-3 rounded-2xl p-4 transition-all duration-300"
+              style={{
+                background: 'rgba(0,255,200,0.06)',
+                border: '1px solid rgba(0,255,200,0.2)'
+              }}
+              whileHover={{ background: 'rgba(0,255,200,0.12)' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, delay: 0.3 + socials.length * 0.08 }}
+            >
+              <svg className="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+              </svg>
+              <span className="text-sm font-semibold text-accent" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                Download Resume
+              </span>
+            </motion.a>
+          </motion.div>
+        </div>
+
+        {/* Footer */}
+        <motion.div
+          className="mt-20 flex flex-col md:flex-row md:items-end md:justify-between gap-4"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+        >
+          <span className="text-[10px] text-white/20 uppercase tracking-[0.3em]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            © 2026 Nitin Mishra
+          </span>
+          <span className="text-[10px] text-white/20 uppercase tracking-[0.3em]" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            Bhopal, India
+          </span>
+        </motion.div>
       </div>
     </motion.section>
   );
 };
 
 export default ContactSection;
+

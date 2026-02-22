@@ -171,16 +171,27 @@ const RecognitionSection = () => {
           </motion.div>
 
           <div className="col-span-12 md:col-span-10 md:col-start-3">
-            <motion.h2
-              className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
-              style={{ fontFamily: 'var(--font-heading)' }}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            >
-              ACHIEVEMENTS<br />
-              <span className="text-white/20">& WINS</span>
-            </motion.h2>
+            <div className="flex items-center gap-6">
+              <motion.h2
+                className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                ACHIEVEMENTS<br />
+                <span className="text-white/20">& WINS</span>
+              </motion.h2>
+              <motion.img
+                src="/achievements.png"
+                alt="achievements"
+                className="hidden md:block flex-shrink-0"
+                style={{ height: 'clamp(100px, 13vw, 180px)', width: 'auto', opacity: 0.9, borderRadius: '12px' }}
+                initial={{ opacity: 0, x: 30 }}
+                animate={isInView ? { opacity: 0.9, x: 0 } : { opacity: 0, x: 30 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
           </div>
         </div>
 

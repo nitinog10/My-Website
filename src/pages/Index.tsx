@@ -20,7 +20,7 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="relative text-foreground font-mono scrollbar-hide">
+    <main className="relative text-foreground font-mono scrollbar-hide" style={{ position: 'relative' }}>
       {/* Animated abstract background */}
       <AnimatedBackground />
       
