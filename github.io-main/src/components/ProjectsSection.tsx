@@ -120,11 +120,11 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
             }}
           >
             {/* Project image */}
-            <a href={project.github} target="_blank" rel="noopener noreferrer" className="block relative">
+            <a href={project.github} target="_blank" rel="noopener noreferrer" className="block relative bg-black/30">
               <img
                 src={project.image}
                 alt={project.name}
-                className="w-full h-32 md:h-40 object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-40 md:h-48 object-contain transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               
