@@ -105,7 +105,7 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: n
               <img
                 src={project.image}
                 alt={project.name}
-                className="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-48 md:h-56 lg:h-64 object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               

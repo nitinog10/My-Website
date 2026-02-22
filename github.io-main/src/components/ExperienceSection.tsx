@@ -10,9 +10,15 @@ const experiences = [
   },
   {
     role: 'HEAD ALUMNI',
-    company: 'ENTOPLEARNING.COM',
+    company: 'STUDENT ACTIVITY COUNCIL, OIST',
     period: '2025 — 26',
-    description: 'Leading alumni initiatives and mentoring new learners. Contributing to educational technology and community building.'
+    description: 'Leading student initiatives and organizing events. Building community engagement and fostering leadership development.'
+  },
+  {
+    role: 'INTERN',
+    company: 'ENTOPLEARNING.COM',
+    period: '2024',
+    description: 'Contributed to educational technology development. Gained hands-on experience in building learning platforms and content systems.'
   },
   {
     role: 'AI DEVELOPER',

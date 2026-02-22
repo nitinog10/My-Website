@@ -20,20 +20,19 @@ const skillGroups = [
   }
 ];
 
-// 3D Card component with parallax hover
+// 3D Card component with parallax hover and timeline layout
 const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const isLeft = index % 2 === 0;
   
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start end", "end start"]
   });
   
-  const isFromLeft = index % 2 === 0;
-  const xOffset = isFromLeft ? -80 : 80;
-  
+  const xOffset = isLeft ? -80 : 80;
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
   const x = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [xOffset, 0, 0, -xOffset]);
   const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
@@ -58,55 +57,78 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
   };
 
   return (
-    <motion.div
-      ref={cardRef}
-      className="group perspective-1000"
-      style={{ opacity, x, scale }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div ref={cardRef} className="relative">
+      {/* Timeline point */}
       <motion.div
-        className="relative rounded-xl p-6 md:p-8 transition-all duration-300 ease-out"
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: 'preserve-3d',
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
-          border: '1px solid rgba(255,255,255,0.06)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
-        }}
-        whileHover={{
-          boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}
+        className="absolute left-1/2 top-6 -translate-x-1/2 z-10 hidden md:flex items-center justify-center"
+        style={{ opacity }}
       >
-        {/* Glow effect */}
-        <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle at 50% 0%, rgba(0,255,200,0.08) 0%, transparent 60%)'
-          }}
-        />
-        
-        {/* Category header */}
-        <div className="flex items-center gap-3 mb-6" style={{ transform: 'translateZ(20px)' }}>
-          <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_rgba(0,255,200,0.5)]" />
-          <h3 className="text-sm md:text-base font-semibold text-accent uppercase tracking-[0.15em]">
-            {group.category}
-          </h3>
-        </div>
-
-        {/* Skills list */}
-        <div className="space-y-3" style={{ transform: 'translateZ(10px)' }}>
-          {group.skills.map((skill) => (
-            <div key={skill} className="group/skill">
-              <span className="text-sm text-white/60 group-hover/skill:text-white/90 transition-colors duration-300 leading-relaxed block">
-                {skill}
-              </span>
-            </div>
-          ))}
-        </div>
+        <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,255,200,0.6)]" />
       </motion.div>
-    </motion.div>
+
+      {/* Card container - alternating sides */}
+      <div className={`flex ${isLeft ? 'md:justify-start' : 'md:justify-end'} justify-center`}>
+        <motion.div
+          className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
+          style={{ opacity, x, scale }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Connector line */}
+          <div
+            className={`absolute top-8 ${isLeft ? 'right-0' : 'left-0'} w-12 h-px hidden md:block`}
+            style={{
+              background: isLeft 
+                ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.3))' 
+                : 'linear-gradient(to left, transparent, rgba(0,255,200,0.3))'
+            }}
+          />
+
+          {/* Card */}
+          <motion.div
+            className="group relative rounded-xl p-6 md:p-8 transition-all duration-300 ease-out"
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: 'preserve-3d',
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)'
+            }}
+            whileHover={{
+              boxShadow: '0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.1)'
+            }}
+          >
+            {/* Glow effect */}
+            <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              style={{
+                background: 'radial-gradient(circle at 50% 0%, rgba(0,255,200,0.08) 0%, transparent 60%)'
+              }}
+            />
+            
+            {/* Category header */}
+            <div className="flex items-center gap-3 mb-6" style={{ transform: 'translateZ(20px)' }}>
+              <div className="w-2 h-2 rounded-full bg-accent shadow-[0_0_10px_rgba(0,255,200,0.5)]" />
+              <h3 className="text-sm md:text-base font-semibold text-accent uppercase tracking-[0.15em]">
+                {group.category}
+              </h3>
+            </div>
+
+            {/* Skills list */}
+            <div className="space-y-3" style={{ transform: 'translateZ(10px)' }}>
+              {group.skills.map((skill) => (
+                <div key={skill} className="group/skill">
+                  <span className="text-sm text-white/60 group-hover/skill:text-white/90 transition-colors duration-300 leading-relaxed block">
+                    {skill}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
   );
 };
 
@@ -117,23 +139,21 @@ const SkillsSection = () => {
   return (
     <section ref={ref} className="min-h-screen py-32 md:py-48 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="grid grid-cols-12 gap-4">
-          {/* Section indicator */}
+        {/* Section header */}
+        <div className="grid grid-cols-12 gap-4 mb-20">
           <motion.div
             className="col-span-12 md:col-span-2"
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : { opacity: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">003</span>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">002</span>
             <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">CAPABILITIES</span>
           </motion.div>
 
-          {/* Main content */}
           <div className="col-span-12 md:col-span-10 md:col-start-3">
-            {/* Large heading */}
             <motion.h2
-              className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85] mb-20"
+              className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
               style={{ fontFamily: 'var(--font-heading)' }}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
@@ -142,13 +162,16 @@ const SkillsSection = () => {
               WHAT I<br />
               <span className="text-white/20">WORK WITH</span>
             </motion.h2>
+          </div>
+        </div>
 
-            {/* Skills in card grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              {skillGroups.map((group, index) => (
-                <SkillCard key={group.category} group={group} index={index} />
-              ))}
-            </div>
+        {/* Skills with timeline */}
+        <div className="relative">
+          {/* Skills cards */}
+          <div className="space-y-12 md:space-y-16">
+            {skillGroups.map((group, index) => (
+              <SkillCard key={group.category} group={group} index={index} />
+            ))}
           </div>
         </div>
       </div>
