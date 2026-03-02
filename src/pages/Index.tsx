@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import useLenis from '@/hooks/useLenis';
+import MagneticCursor from '@/components/MagneticCursor';
 import NoiseOverlay from '@/components/NoiseOverlay';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import ScrollProgress from '@/components/ScrollProgress';
@@ -20,7 +21,10 @@ const Index = () => {
   }, []);
 
   return (
-    <main className="relative text-foreground font-mono scrollbar-hide" style={{ position: 'relative' }}>
+    <main className="relative text-foreground font-mono scrollbar-hide" style={{ position: 'relative', cursor: 'none' }}>
+      {/* Custom viewfinder cursor */}
+      <MagneticCursor />
+
       {/* Animated abstract background */}
       <AnimatedBackground />
       

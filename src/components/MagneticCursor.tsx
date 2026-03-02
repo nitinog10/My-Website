@@ -1,92 +1,169 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { useEffect, useRef, useCallback } from 'react';
 
 const MagneticCursor = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-  const cursorX = useMotionValue(0);
-  const cursorY = useMotionValue(0);
-  
-  const springConfig = { damping: 25, stiffness: 400 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
+  const cursorRef = useRef<HTMLDivElement>(null);
+  const posRef = useRef({ x: 0, y: 0 });
+  const currentRef = useRef({ x: 0, y: 0 });
+  const rotationRef = useRef(0);
+  const targetRotationRef = useRef(0);
+  const visibleRef = useRef(false);
+  const rafRef = useRef<number>(0);
+  const prevRef = useRef({ x: 0, y: 0 });
+
+  const animate = useCallback(() => {
+    const el = cursorRef.current;
+    if (!el) return;
+
+    // Lerp position (instant tracking, no lag)
+    const lerpFactor = 0.35;
+    currentRef.current.x += (posRef.current.x - currentRef.current.x) * lerpFactor;
+    currentRef.current.y += (posRef.current.y - currentRef.current.y) * lerpFactor;
+
+    // Calculate velocity for rotation
+    const dx = posRef.current.x - prevRef.current.x;
+    const dy = posRef.current.y - prevRef.current.y;
+    const speed = Math.sqrt(dx * dx + dy * dy);
+
+    if (speed > 1.5) {
+      // Rotate in direction of movement
+      targetRotationRef.current += speed * 1.8;
+    }
+
+    // Smooth rotation lerp
+    rotationRef.current += (targetRotationRef.current - rotationRef.current) * 0.12;
+
+    prevRef.current.x = posRef.current.x;
+    prevRef.current.y = posRef.current.y;
+
+    el.style.transform = `translate3d(${currentRef.current.x}px, ${currentRef.current.y}px, 0) translate(-50%, -50%) rotate(${rotationRef.current}deg)`;
+    el.style.opacity = visibleRef.current ? '1' : '0';
+
+    rafRef.current = requestAnimationFrame(animate);
+  }, []);
 
   useEffect(() => {
+    // Hide on mobile
+    if (window.innerWidth < 768) return;
+
     const handleMouseMove = (e: MouseEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
-      setIsVisible(true);
+      posRef.current.x = e.clientX;
+      posRef.current.y = e.clientY;
+      visibleRef.current = true;
     };
 
     const handleMouseLeave = () => {
-      setIsVisible(false);
+      visibleRef.current = false;
     };
 
-    const handleMouseEnter = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('[data-magnetic]')) {
-        setIsHovering(true);
-      } else {
-        setIsHovering(false);
-      }
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseleave', handleMouseLeave);
-    document.addEventListener('mouseover', handleMouseEnter);
+
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
-      document.removeEventListener('mouseover', handleMouseEnter);
+      cancelAnimationFrame(rafRef.current);
     };
-  }, [cursorX, cursorY]);
+  }, [animate]);
 
-  // Hide on mobile
+  // Hide on mobile via SSR check
   if (typeof window !== 'undefined' && window.innerWidth < 768) {
     return null;
   }
 
-  return (
-    <>
-      {/* Main cursor dot */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference hidden md:block"
-        style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
-        }}
-      >
-        <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"
-          animate={{
-            width: isHovering ? 60 : 8,
-            height: isHovering ? 60 : 8,
-            opacity: isVisible ? 1 : 0,
-          }}
-          transition={{ duration: 0.2 }}
-        />
-      </motion.div>
+  const cornerSize = 10;
+  const gap = 8;
+  const strokeWidth = 2;
+  const color = 'rgba(255, 255, 255, 0.85)';
 
-      {/* Trailing ring */}
-      <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] hidden md:block"
-        style={{
-          x: cursorXSpring,
-          y: cursorYSpring,
-        }}
-      >
-        <motion.div
-          className="relative -translate-x-1/2 -translate-y-1/2 rounded-full border border-accent/30"
-          animate={{
-            width: isHovering ? 80 : 32,
-            height: isHovering ? 80 : 32,
-            opacity: isVisible ? 0.5 : 0,
+  return (
+    <div
+      ref={cursorRef}
+      className="fixed top-0 left-0 pointer-events-none z-[9999] hidden md:block"
+      style={{ opacity: 0, willChange: 'transform' }}
+    >
+      {/* Viewfinder container */}
+      <div style={{ width: 44, height: 44, position: 'relative' }}>
+        {/* Center dot */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: 5,
+            height: 5,
+            borderRadius: '50%',
+            backgroundColor: color,
+            transform: 'translate(-50%, -50%)',
           }}
-          transition={{ duration: 0.3, delay: 0.05 }}
         />
-      </motion.div>
-    </>
+
+        {/* Top-left corner */}
+        <svg
+          style={{ position: 'absolute', top: gap, left: gap }}
+          width={cornerSize}
+          height={cornerSize}
+          viewBox={`0 0 ${cornerSize} ${cornerSize}`}
+        >
+          <polyline
+            points={`0,${cornerSize} 0,0 ${cornerSize},0`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="square"
+          />
+        </svg>
+
+        {/* Top-right corner */}
+        <svg
+          style={{ position: 'absolute', top: gap, right: gap }}
+          width={cornerSize}
+          height={cornerSize}
+          viewBox={`0 0 ${cornerSize} ${cornerSize}`}
+        >
+          <polyline
+            points={`0,0 ${cornerSize},0 ${cornerSize},${cornerSize}`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="square"
+          />
+        </svg>
+
+        {/* Bottom-right corner */}
+        <svg
+          style={{ position: 'absolute', bottom: gap, right: gap }}
+          width={cornerSize}
+          height={cornerSize}
+          viewBox={`0 0 ${cornerSize} ${cornerSize}`}
+        >
+          <polyline
+            points={`${cornerSize},0 ${cornerSize},${cornerSize} 0,${cornerSize}`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="square"
+          />
+        </svg>
+
+        {/* Bottom-left corner */}
+        <svg
+          style={{ position: 'absolute', bottom: gap, left: gap }}
+          width={cornerSize}
+          height={cornerSize}
+          viewBox={`0 0 ${cornerSize} ${cornerSize}`}
+        >
+          <polyline
+            points={`0,0 0,${cornerSize} ${cornerSize},${cornerSize}`}
+            fill="none"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            strokeLinecap="square"
+          />
+        </svg>
+      </div>
+    </div>
   );
 };
 
