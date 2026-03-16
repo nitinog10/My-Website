@@ -431,14 +431,16 @@ const TechEcosystem = () => {
     if (!canvasRef.current) return;
 
     const ctx = gsap.context(() => {
+      // Staggered fade-in of canvas
       gsap.fromTo(
         canvasRef.current,
-        { opacity: 0, scale: 0.8 },
+        { opacity: 0, scale: 0.9, rotateX: -10 },
         {
           opacity: 1,
           scale: 1,
+          rotateX: 0,
           duration: 1.5,
-          ease: 'power2.out',
+          ease: 'power3.out',
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top 60%',
@@ -451,86 +453,173 @@ const TechEcosystem = () => {
     return () => ctx.revert();
   }, []);
 
+  // Group technologies by category
+  const categories = Array.from(new Set(techStack.map(t => t.category)));
+  const techByCategory = categories.map(cat => ({
+    name: cat,
+    count: techStack.filter(t => t.category === cat).length,
+    color: techStack.find(t => t.category === cat)?.color || '#00ffc8'
+  }));
+
   return (
-    <section
-      ref={sectionRef}
-      className="relative min-h-screen py-32 overflow-hidden bg-black"
-    >
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-gradient-radial from-accent/10 via-transparent to-transparent opacity-50" />
+    <>
+      <section
+        ref={sectionRef}
+        className="relative min-h-screen py-32 overflow-hidden bg-black"
+      >
+        {/* Animated gradient background with parallax */}
+        <motion.div 
+          className="absolute inset-0 bg-gradient-radial from-accent/10 via-transparent to-transparent opacity-50"
+          style={{
+            x: mousePosition.x * 20,
+            y: mousePosition.y * 20,
+          }}
+        />
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        {/* Header */}
-        <motion.div
-          className="mb-20"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block">
-            002 — TECHNICAL ECOSYSTEM
-          </span>
-          <h2 className="text-[clamp(3rem, 10vw, 8rem)] font-black uppercase tracking-tighter leading-[0.85] text-white">
-            WHAT I<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
-              WORK WITH
-            </span>
-          </h2>
-        </motion.div>
-
-        {/* 3D Canvas */}
-        <motion.div
-          ref={canvasRef}
-          className="relative h-[600px] rounded-3xl overflow-hidden border border-white/10 bg-black/50 backdrop-blur-sm"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-        >
-          <Canvas camera={{ position: [0, 0, 8], fov: 50 }}>
-            <Scene onTechHover={setHoveredTech} />
-          </Canvas>
-
-          {/* Hover info overlay */}
+        <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+          {/* Header with stagger animation */}
           <motion.div
-            className="absolute bottom-8 left-8 pointer-events-none"
-            initial={{ opacity: 0, x: -20 }}
-            animate={hoveredTech ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+            className="mb-20"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            {hoveredTech && (
-              <div className="bg-black/90 backdrop-blur-xl p-6 rounded-2xl border border-accent/30">
-                <h3 className="text-2xl font-bold text-white mb-1">{hoveredTech.name}</h3>
-                <p className="text-xs text-accent uppercase tracking-widest">{hoveredTech.category}</p>
-              </div>
-            )}
+            <motion.span 
+              className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block"
+              initial={{ opacity: 0, x: -20 }}
+              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+              transition={{ delay: 0.2 }}
+            >
+              002 — TECHNICAL ECOSYSTEM
+            </motion.span>
+            <motion.h2 
+              className="text-[clamp(3rem, 10vw, 8rem)] font-black uppercase tracking-tighter leading-[0.85] text-white mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ delay: 0.3 }}
+            >
+              WHAT I<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
+                WORK WITH
+              </span>
+            </motion.h2>
+            <motion.p 
+              className="text-lg text-white/60 max-w-2xl"
+              initial={{ opacity: 0 }}
+              animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              An interactive neural network of technologies, frameworks, and tools. 
+              Hover to explore, click for details.
+            </motion.p>
           </motion.div>
 
-          {/* Instructions */}
-          <div className="absolute top-8 right-8 text-right pointer-events-none">
-            <p className="text-xs text-white/40 uppercase tracking-wider">Drag to rotate • Explore the ecosystem</p>
-          </div>
-        </motion.div>
+          {/* 3D Canvas */}
+          <motion.div
+            ref={canvasRef}
+            className="relative h-[700px] rounded-3xl overflow-hidden border border-white/10 bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+          >
+            <Canvas camera={{ position: [0, 0, 10], fov: 50 }}>
+              <Scene onTechHover={setHoveredTech} onTechClick={setSelectedTech} />
+            </Canvas>
 
-        {/* Category legend */}
-        <motion.div
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ delay: 0.4 }}
-        >
-          {['Language', 'Frontend', 'Backend', 'AI/ML', 'DevOps', 'Cloud'].map((cat, i) => (
-            <motion.div
-              key={cat}
-              className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-accent/30 transition-all"
-              whileHover={{ y: -4 }}
-            >
-              <p className="text-sm font-bold text-white uppercase">{cat}</p>
-              <p className="text-xs text-white/50 mt-1">
-                {techStack.filter(t => t.category === cat).length} tools
+            {/* Hover info overlay */}
+            <AnimatePresence>
+              {hoveredTech && !selectedTech && (
+                <motion.div
+                  className="absolute bottom-8 left-8 pointer-events-none"
+                  initial={{ opacity: 0, x: -20, y: 10 }}
+                  animate={{ opacity: 1, x: 0, y: 0 }}
+                  exit={{ opacity: 0, x: -20, y: 10 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <div 
+                    className="bg-black/95 backdrop-blur-xl p-6 rounded-2xl border"
+                    style={{ borderColor: `${hoveredTech.color}40` }}
+                  >
+                    <h3 className="text-2xl font-bold text-white mb-1">{hoveredTech.name}</h3>
+                    <p className="text-xs uppercase tracking-widest mb-3" style={{ color: hoveredTech.color }}>
+                      {hoveredTech.category}
+                    </p>
+                    <p className="text-sm text-white/70 max-w-xs">
+                      {hoveredTech.description}
+                    </p>
+                    <p className="text-xs text-white/50 mt-3">Click to view details</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Instructions */}
+            <div className="absolute top-8 right-8 text-right pointer-events-none">
+              <motion.p 
+                className="text-xs text-white/40 uppercase tracking-wider mb-1"
+                animate={{ opacity: [0.4, 0.7, 0.4] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                Drag to rotate • Scroll to zoom
+              </motion.p>
+              <p className="text-xs text-white/30 uppercase tracking-wider">
+                Click nodes for details
               </p>
-            </motion.div>
-          ))}
-        </motion.div>
-      </div>
-    </section>
+            </div>
+
+            {/* Particle count */}
+            <div className="absolute bottom-8 right-8 pointer-events-none">
+              <div className="bg-black/80 backdrop-blur-md px-4 py-2 rounded-full border border-accent/20">
+                <p className="text-xs text-accent font-bold uppercase tracking-wider">
+                  {techStack.length} Technologies
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Category clusters */}
+          <motion.div
+            className="mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ delay: 0.6 }}
+          >
+            {techByCategory.map((cat, i) => (
+              <motion.div
+                key={cat.name}
+                className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-white/20 transition-all group cursor-pointer"
+                whileHover={{ y: -4, scale: 1.02 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ delay: 0.7 + i * 0.05 }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ 
+                      backgroundColor: cat.color,
+                      boxShadow: `0 0 10px ${cat.color}60`
+                    }}
+                  />
+                  <h3 className="text-sm font-bold text-white uppercase tracking-tight">
+                    {cat.name}
+                  </h3>
+                </div>
+                <p className="text-xs text-white/50">
+                  {cat.count} {cat.count === 1 ? 'tool' : 'tools'}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Tech detail modal */}
+      <AnimatePresence>
+        {selectedTech && (
+          <TechDetailModal tech={selectedTech} onClose={() => setSelectedTech(null)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
