@@ -73,31 +73,40 @@ const TechCard = ({ tech, index }: any) => {
       ref={cardRef}
       initial={{ 
         opacity: 0, 
-        scale: 0.5, 
-        rotateY: -180,
+        scale: 0,
+        rotateZ: -180,
+        y: 100
       }}
       animate={isInView ? { 
         opacity: 1, 
         scale: 1, 
-        rotateY: 0,
+        rotateZ: 0,
+        y: 0,
         transition: {
-          duration: 0.8,
-          delay: index * 0.08,
-          ease: [0.25, 0.46, 0.45, 0.94],
-          opacity: { duration: 0.6 },
+          duration: 0.7,
+          delay: index * 0.05,
+          ease: [0.34, 1.56, 0.64, 1], // Elastic ease
+          opacity: { duration: 0.4 },
           scale: { 
             type: "spring",
-            stiffness: 100,
+            stiffness: 200,
+            damping: 12,
+            mass: 0.8
+          },
+          rotateZ: {
+            type: "spring",
+            stiffness: 150,
             damping: 15
           }
         }
       } : { 
         opacity: 0, 
-        scale: 0.5, 
-        rotateY: -180,
+        scale: 0,
+        rotateZ: -180,
+        y: 100,
         transition: {
-          duration: 0.5,
-          ease: [0.25, 0.46, 0.45, 0.94]
+          duration: 0.4,
+          ease: [0.34, 1.56, 0.64, 1]
         }
       }}
       onMouseEnter={() => setHovered(true)}
@@ -132,54 +141,144 @@ const TechCard = ({ tech, index }: any) => {
         <motion.div
           className="flex flex-col items-center gap-2"
           whileHover={{ 
-            scale: 1.15,
-            y: -5,
+            scale: 1.2,
+            y: -8,
             transition: {
               type: "spring",
-              stiffness: 400,
-              damping: 17
+              stiffness: 500,
+              damping: 15,
+              mass: 0.5
+            }
+          }}
+          whileTap={{
+            scale: 0.9,
+            rotate: [0, -10, 10, -10, 0],
+            transition: {
+              duration: 0.4,
+              ease: "easeInOut"
             }
           }}
         >
           <motion.div
             animate={hovered ? { 
-              rotate: [0, -8, 8, -8, 0],
+              rotate: [0, -10, 10, -10, 10, 0],
+              scale: [1, 1.05, 1.1, 1.05, 1],
               transition: {
-                duration: 0.5,
-                ease: "easeInOut"
+                duration: 0.6,
+                ease: "easeInOut",
+                times: [0, 0.2, 0.4, 0.6, 1]
               }
             } : { 
-              rotate: 0
+              rotate: 0,
+              scale: 1
             }}
           >
-            <IconComponent
-              className="w-12 h-12 md:w-14 md:h-14"
-              style={{
-                color: hovered ? tech.color : '#888888',
-                filter: hovered 
-                  ? `drop-shadow(0 0 20px ${tech.color})` 
-                  : 'none',
-                transition: 'all 0.3s ease',
-              }}
-            />
+            <motion.div
+              animate={hovered ? {
+                boxShadow: [
+                  `0 0 0px ${tech.color}00`,
+                  `0 0 20px ${tech.color}80`,
+                  `0 0 40px ${tech.color}60`,
+                  `0 0 20px ${tech.color}80`,
+                  `0 0 0px ${tech.color}00`,
+                ],
+                transition: {
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }
+              } : {}}
+              className="rounded-full p-2"
+            >
+              <IconComponent
+                className="w-12 h-12 md:w-14 md:h-14"
+                style={{
+                  color: hovered ? tech.color : '#888888',
+                  filter: hovered 
+                    ? `drop-shadow(0 0 20px ${tech.color})` 
+                    : 'none',
+                  transition: 'all 0.3s ease',
+                }}
+              />
+            </motion.div>
           </motion.div>
 
           {/* Tooltip on hover */}
           {hovered && (
             <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 10, scale: 0.8 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0, 
+                scale: 1,
+                transition: {
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 20
+                }
+              }}
+              exit={{ opacity: 0, y: 10, scale: 0.8 }}
               className="absolute top-full mt-2 whitespace-nowrap pointer-events-none z-50"
             >
-              <div className="px-3 py-1.5 rounded-lg bg-black/90 backdrop-blur-md border border-white/10">
+              <motion.div 
+                className="px-3 py-1.5 rounded-lg bg-black/90 backdrop-blur-md border"
+                style={{ borderColor: tech.color + '40' }}
+                animate={{
+                  boxShadow: [
+                    `0 0 10px ${tech.color}20`,
+                    `0 0 20px ${tech.color}40`,
+                    `0 0 10px ${tech.color}20`,
+                  ],
+                  transition: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }
+                }}
+              >
                 <p className="text-xs font-bold text-white">{tech.name}</p>
                 <p className="text-[10px] uppercase tracking-wider" style={{ color: tech.color }}>
                   {tech.category}
                 </p>
-              </div>
+              </motion.div>
             </motion.div>
           )}
         </motion.div>
+
+        {/* Ripple effect on hover */}
+        {hovered && (
+          <>
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 pointer-events-none"
+              style={{ borderColor: tech.color }}
+              initial={{ scale: 0.8, opacity: 0.8 }}
+              animate={{
+                scale: [0.8, 1.5, 2],
+                opacity: [0.8, 0.4, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeOut"
+              }}
+            />
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 pointer-events-none"
+              style={{ borderColor: tech.color }}
+              initial={{ scale: 0.8, opacity: 0.8 }}
+              animate={{
+                scale: [0.8, 1.5, 2],
+                opacity: [0.8, 0.4, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeOut",
+                delay: 0.5
+              }}
+            />
+          </>
+        )}
       </div>
     </motion.div>
   );
