@@ -1,7 +1,6 @@
 import { useRef } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import { SiGithub } from 'react-icons/si';
-import { FaLinkedinIn } from 'react-icons/fa6';
+import { SiLinkedin, SiGithub } from 'react-icons/si';
 import { HiDocumentText } from 'react-icons/hi';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -176,7 +175,7 @@ const IntroSection = () => {
                 rel="noopener noreferrer"
                 className="text-xs tracking-[0.2em] text-muted-foreground/60 hover:text-accent transition-colors duration-300 uppercase flex items-center gap-2 group"
               >
-                <FaLinkedinIn className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                <SiLinkedin className="w-4 h-4 group-hover:scale-110 transition-transform" />
                 LINKEDIN
               </a>
               <a

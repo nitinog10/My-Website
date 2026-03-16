@@ -1,9 +1,5 @@
 import { useEffect, useRef } from 'react';
 import Lenis from '@studio-freight/lenis';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export const useLenis = () => {
   const lenisRef = useRef<Lenis | null>(null);
@@ -21,19 +17,14 @@ export const useLenis = () => {
 
     lenisRef.current = lenis;
 
-    const onLenisScroll = () => ScrollTrigger.update();
-    lenis.on('scroll', onLenisScroll);
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
 
-    const onTick = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-
-    gsap.ticker.add(onTick);
-    gsap.ticker.lagSmoothing(0);
-    ScrollTrigger.refresh();
+    requestAnimationFrame(raf);
 
     return () => {
-      gsap.ticker.remove(onTick);
       lenis.destroy();
     };
   }, []);

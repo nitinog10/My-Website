@@ -1,8 +1,5 @@
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useRef, useState } from 'react';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
 const projects = [
   {
@@ -47,127 +44,194 @@ const projects = [
   }
 ];
 
-const ProjectsSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
+// 3D Project card with timeline layout
+const ProjectCard = ({ project, index }: { project: typeof projects[0]; index: number }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const isLeft = index % 2 === 0;
+  
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+  
+  const xOffset = isLeft ? -80 : 80;
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const x = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [xOffset, 0, 0, -xOffset]);
+  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
 
-  useEffect(() => {
-    if (!sectionRef.current) {
-      return;
-    }
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    setRotateX(-(e.clientY - centerY) / 30);
+    setRotateY((e.clientX - centerX) / 30);
+  };
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        '[data-project-heading]',
-        { y: 40, opacity: 0, clipPath: 'inset(0 0 100% 0)' },
-        {
-          y: 0,
-          opacity: 1,
-          clipPath: 'inset(0 0 0% 0)',
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 78%',
-            end: 'top 40%',
-            scrub: true,
-          },
-        }
-      );
-
-      gsap.fromTo(
-        '[data-project-card]',
-        { y: 70, rotateX: 12, opacity: 0, transformOrigin: 'center top' },
-        {
-          y: 0,
-          rotateX: 0,
-          opacity: 1,
-          duration: 0.9,
-          stagger: 0.12,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: '[data-project-grid]',
-            start: 'top 82%',
-            end: 'top 30%',
-            scrub: true,
-          },
-        }
-      );
-
-      gsap.to('[data-project-card]', {
-        y: -40,
-        opacity: 0.2,
-        scale: 0.94,
-        stagger: 0.08,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: '70% top',
-          end: 'bottom top',
-          scrub: true,
-        },
-      });
-    }, sectionRef);
-
-    return () => {
-      ctx.revert();
-    };
-  }, []);
+  const handleMouseLeave = () => {
+    setRotateX(0);
+    setRotateY(0);
+  };
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 md:py-44 overflow-hidden" style={{ background: 'radial-gradient(circle at 10% 10%, rgba(0,255,200,0.07), transparent 34%), radial-gradient(circle at 90% 85%, rgba(255,120,90,0.09), transparent 34%)' }}>
+    <div ref={cardRef} className="relative">
+      {/* Timeline point */}
+      <motion.div
+        className="absolute left-1/2 top-10 -translate-x-1/2 z-10 hidden md:flex items-center justify-center"
+        style={{ opacity }}
+      >
+        <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,255,200,0.6)]" />
+      </motion.div>
+
+      {/* Card container - alternating sides */}
+      <div className={`flex ${isLeft ? 'md:justify-start' : 'md:justify-end'} justify-center`}>
+        <motion.div
+          className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
+          style={{ opacity, x, scale }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Connector line */}
+          <div
+            className={`absolute top-12 ${isLeft ? 'right-0' : 'left-0'} w-12 h-px hidden md:block`}
+            style={{
+              background: isLeft 
+                ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.3))' 
+                : 'linear-gradient(to left, transparent, rgba(0,255,200,0.3))'
+            }}
+          />
+
+          {/* Card */}
+          <motion.div
+            className="group relative rounded-2xl overflow-hidden transition-all duration-300 ease-out"
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: 'preserve-3d',
+              background: 'rgba(17, 17, 20, 0.9)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
+            }}
+            whileHover={{
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.12)'
+            }}
+          >
+            {/* Top accent border */}
+            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent z-10" />
+            
+            {/* Project image */}
+            <a href={project.github} target="_blank" rel="noopener noreferrer" className="block relative">
+              <div className="w-full aspect-video bg-black/20 overflow-hidden">
+                <img
+                  src={project.image}
+                  alt={project.name}
+                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+              
+              {/* View project overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40">
+                <span className="px-4 py-2 rounded-full bg-accent/20 backdrop-blur-sm text-accent text-xs font-medium tracking-wider border border-accent/30" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                  View Project
+                </span>
+              </div>
+            </a>
+
+            {/* Content */}
+            <div className="p-5 md:p-6">
+              {/* Index */}
+              <span className="text-accent text-xs font-medium tracking-wider mb-3 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                0{index + 1}
+              </span>
+              
+              {/* Project name */}
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-3 group-hover:text-accent transition-colors duration-300" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                {project.name.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
+              </h3>
+              
+              {/* Description */}
+              <p className="text-sm text-white/50 leading-relaxed mb-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                {project.description}
+              </p>
+              
+              {/* Stack */}
+              <span className="text-xs text-white/30 tracking-wide block mb-4" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                {project.stack}
+              </span>
+
+              {/* GitHub link */}
+              <a 
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-xs text-white/40 hover:text-accent transition-colors duration-300"
+                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+              >
+                <span>View on GitHub</span>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+                </svg>
+              </a>
+            </div>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+const ProjectsSection = () => {
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: false, margin: "-10%" });
+
+  return (
+    <section ref={ref} className="min-h-screen py-32 md:py-48 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        <div className="mb-16 md:mb-20">
-          <span className="text-xs md:text-sm tracking-[0.28em] text-white/40 uppercase">003 / Projects</span>
-          <h2 data-project-heading className="mt-5 text-[clamp(2.6rem,7vw,5.8rem)] font-bold leading-[0.85] tracking-[-0.04em] text-white uppercase">
-            Build Log
-            <br />
-            <span className="text-white/35">In Public</span>
-          </h2>
-          <p className="mt-6 max-w-2xl text-sm md:text-base text-white/50 leading-relaxed">
-            Real products, fast iterations, and systems built to ship. Every card opens code or demos and every scroll step feels like moving across a live board.
-          </p>
+        {/* Section header */}
+        <div className="grid grid-cols-12 gap-4 mb-24">
+          <motion.div
+            className="col-span-12 md:col-span-2"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">003</span>
+            <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">WORK</span>
+          </motion.div>
+          
+          <div className="col-span-12 md:col-span-10 md:col-start-3">
+            <div className="flex items-center gap-6">
+              <motion.h2
+                className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                SELECTED<br />
+                <span className="text-white/20">PROJECTS</span>
+              </motion.h2>
+              <motion.img
+                src="/projects.png"
+                alt="projects"
+                className="hidden md:block flex-shrink-0"
+                style={{ height: 'clamp(100px, 13vw, 180px)', width: 'auto', opacity: 0.9, borderRadius: '12px' }}
+                initial={{ opacity: 0, x: 30 }}
+                animate={isInView ? { opacity: 0.9, x: 0 } : { opacity: 0, x: 30 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </div>
+          </div>
         </div>
 
-        <div data-project-grid className="grid grid-cols-12 gap-5 md:gap-6" style={{ perspective: '1200px' }}>
-          {projects.map((project, index) => {
-            const isFeature = index === 0;
-
-            return (
-              <article
-                data-project-card
-                key={project.name}
-                className={`${isFeature ? 'col-span-12 md:col-span-7' : 'col-span-12 md:col-span-5'} group relative rounded-3xl border border-white/10 bg-black/35 backdrop-blur-xl overflow-hidden transition-transform duration-500 hover:-translate-y-1`}
-              >
-                <a href={project.github} target="_blank" rel="noopener noreferrer" className="block">
-                  <div className={`${isFeature ? 'aspect-[16/9]' : 'aspect-[16/10]'} overflow-hidden`}>
-                    <img
-                      src={project.image}
-                      alt={project.name}
-                      className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                  <div className="absolute top-4 left-4 rounded-full border border-white/20 bg-black/50 px-3 py-1 text-[10px] tracking-[0.22em] text-white/70 uppercase">
-                    0{index + 1}
-                  </div>
-
-                  <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                    <p className="text-[10px] md:text-xs tracking-[0.2em] uppercase text-accent mb-3">{project.company}</p>
-                    <h3 className="text-xl md:text-2xl font-semibold tracking-[-0.02em] text-white">{project.name}</h3>
-                    <p className="mt-3 text-sm text-white/70 max-w-2xl leading-relaxed">{project.description}</p>
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {project.stack.split('·').map((item) => (
-                        <span key={`${project.name}-${item}`} className="rounded-full border border-white/20 px-3 py-1 text-[11px] text-white/70 bg-black/30">
-                          {item.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </a>
-              </article>
-            );
-          })}
+        {/* Projects */}
+        <div className="space-y-12 md:space-y-16">
+          {projects.map((project, index) => (
+            <ProjectCard key={project.name} project={project} index={index} />
+          ))}
         </div>
       </div>
     </section>
