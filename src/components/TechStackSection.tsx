@@ -339,8 +339,8 @@ const TechStackSection = () => {
             <div className="flex items-center gap-4 mb-6">
               <span className="text-[10px] md:text-sm tracking-[0.5em] text-accent font-bold uppercase py-1 border-b border-accent/30">006 | INVENTORY</span>
             </div>
-            <h2 className="text-6xl md:text-9xl font-bold text-white uppercase tracking-tighter leading-[0.8]">
-              TECHNICAL<br />
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white uppercase tracking-tighter leading-[0.85]">
+              TECH<br />
               <span className="text-white/20">STACK</span>
             </h2>
           </motion.div>
