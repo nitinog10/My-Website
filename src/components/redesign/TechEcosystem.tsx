@@ -129,59 +129,119 @@ const techStack = [
   },
 ];
 
-const TechNode = ({ tech, index, onHover }: any) => {
+const TechNode = ({ tech, index, onHover, onClick }: any) => {
   const meshRef = useRef<THREE.Mesh>(null!);
   const [hovered, setHovered] = useState(false);
+  const glowRef = useRef<THREE.Mesh>(null!);
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    meshRef.current.position.y += Math.sin(time * 0.5 + index) * 0.001;
-    meshRef.current.rotation.y += 0.002;
     
-    if (hovered) {
-      meshRef.current.scale.lerp(new THREE.Vector3(1.3, 1.3, 1.3), 0.1);
-    } else {
-      meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
+    // Floating animation
+    meshRef.current.position.y = tech.y + Math.sin(time * 0.5 + index * 0.5) * 0.15;
+    meshRef.current.position.x = tech.x + Math.cos(time * 0.3 + index * 0.3) * 0.1;
+    
+    // Rotation
+    meshRef.current.rotation.y += 0.005;
+    meshRef.current.rotation.x = Math.sin(time * 0.2) * 0.1;
+    
+    // Scale on hover
+    const targetScale = hovered ? 1.4 : 1;
+    meshRef.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
+    
+    // Glow effect
+    if (glowRef.current) {
+      glowRef.current.scale.lerp(
+        new THREE.Vector3(hovered ? 1.8 : 1.2, hovered ? 1.8 : 1.2, hovered ? 1.8 : 1.2), 
+        0.1
+      );
     }
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      position={[tech.x, tech.y, tech.z]}
-      onPointerOver={() => { setHovered(true); onHover(tech); }}
-      onPointerOut={() => { setHovered(false); onHover(null); }}
-    >
-      <sphereGeometry args={[0.3, 32, 32]} />
-      <meshStandardMaterial
-        color={tech.color}
-        emissive={tech.color}
-        emissiveIntensity={hovered ? 0.8 : 0.3}
-        metalness={0.8}
-        roughness={0.2}
-      />
-    </mesh>
+    <group>
+      {/* Outer glow */}
+      <mesh
+        ref={glowRef}
+        position={[tech.x, tech.y, tech.z]}
+      >
+        <sphereGeometry args={[0.35, 32, 32]} />
+        <meshBasicMaterial
+          color={tech.color}
+          transparent
+          opacity={hovered ? 0.3 : 0.1}
+        />
+      </mesh>
+      
+      {/* Main node */}
+      <mesh
+        ref={meshRef}
+        position={[tech.x, tech.y, tech.z]}
+        onPointerOver={() => { setHovered(true); onHover(tech); }}
+        onPointerOut={() => { setHovered(false); onHover(null); }}
+        onClick={() => onClick(tech)}
+      >
+        <sphereGeometry args={[0.25, 32, 32]} />
+        <meshStandardMaterial
+          color={tech.color}
+          emissive={tech.color}
+          emissiveIntensity={hovered ? 1.2 : 0.4}
+          metalness={0.9}
+          roughness={0.1}
+        />
+      </mesh>
+      
+      {/* Pulse ring on hover */}
+      {hovered && (
+        <mesh position={[tech.x, tech.y, tech.z]} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[0.3, 0.35, 32]} />
+          <meshBasicMaterial color={tech.color} transparent opacity={0.6} />
+        </mesh>
+      )}
+    </group>
   );
 };
 
 const ConnectionLines = ({ techs }: any) => {
-  const points = techs.map((t: any) => new THREE.Vector3(t.x, t.y, t.z));
+  // Create neural network connections based on category proximity
+  const connections: Array<[THREE.Vector3, THREE.Vector3]> = [];
+  
+  techs.forEach((tech: any, i: number) => {
+    techs.forEach((otherTech: any, j: number) => {
+      if (i < j) {
+        const distance = Math.sqrt(
+          Math.pow(tech.x - otherTech.x, 2) +
+          Math.pow(tech.y - otherTech.y, 2) +
+          Math.pow(tech.z - otherTech.z, 2)
+        );
+        
+        // Connect nodes that are close or in same category
+        if (distance < 2.5 || tech.category === otherTech.category) {
+          connections.push([
+            new THREE.Vector3(tech.x, tech.y, tech.z),
+            new THREE.Vector3(otherTech.x, otherTech.y, otherTech.z)
+          ]);
+        }
+      }
+    });
+  });
   
   return (
     <>
-      {points.map((point: THREE.Vector3, i: number) => {
-        if (i === points.length - 1) return null;
-        return (
-          <Line
-            key={i}
-            points={[point, points[i + 1]]}
-            color="rgba(0, 255, 200, 0.2)"
-            lineWidth={1}
-            transparent
-            opacity={0.3}
-          />
-        );
-      })}
+      {connections.map((points, i) => (
+        <Line
+          key={i}
+          points={points}
+          color="rgba(0, 255, 200, 0.15)"
+          lineWidth={1}
+          transparent
+          opacity={0.3}
+          dashed
+          dashScale={50}
+          dashSize={0.5}
+          gapSize={0.5}
+        />
+      ))}
     </>
   );
 };
