@@ -293,8 +293,145 @@ const TechStackSection = () => {
         >
           <SkillNeuralNetwork />
         </motion.div>
+
+        {/* Tech Icons Grid */}
+        <motion.div
+          className="mt-16"
+          initial={{ opacity: 0, y: 40 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-2xl font-bold text-white uppercase tracking-tight">
+              Technology Stack
+            </h3>
+            <div className="h-px flex-1 ml-8 bg-gradient-to-r from-accent/30 to-transparent" />
+          </div>
+
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+            {technologies.map((tech, i) => (
+              <TechIconCard key={tech.name} tech={tech} index={i} isInView={isInView} />
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
+  );
+};
+
+const TechIconCard = ({ tech, index, isInView }: any) => {
+  const [isActive, setIsActive] = useState(false);
+  const IconComponent = tech.icon;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.8 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.8 }}
+      exit={{ opacity: 0, scale: 0.8, y: -20 }}
+      transition={{
+        duration: 0.5,
+        delay: 0.6 + (index * 0.03),
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      whileHover={{ y: -8, scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => setIsActive(!isActive)}
+      className={`
+        group relative p-6 rounded-2xl cursor-pointer
+        transition-all duration-300
+        ${isActive 
+          ? 'bg-cyan-500/20 border-cyan-400/50' 
+          : 'bg-white/5 border-white/10 hover:border-white/20'
+        }
+        border backdrop-blur-sm
+      `}
+    >
+      {/* Background glow on active */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isActive ? 1 : 0 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          background: `radial-gradient(circle at center, rgba(34, 211, 238, 0.15), transparent)`,
+          boxShadow: isActive ? '0 0 30px rgba(34, 211, 238, 0.3)' : 'none',
+        }}
+      />
+
+      {/* Icon with rotation on hover */}
+      <motion.div
+        className="flex items-center justify-center mb-3"
+        whileHover={{ rotate: 360 }}
+        transition={{ duration: 0.6, ease: 'easeInOut' }}
+      >
+        <IconComponent
+          className="w-10 h-10 transition-all duration-300"
+          style={{
+            color: isActive ? '#22d3ee' : tech.color,
+            filter: isActive 
+              ? 'drop-shadow(0 0 12px rgba(34, 211, 238, 0.8))' 
+              : `drop-shadow(0 0 6px ${tech.color}40)`,
+          }}
+        />
+      </motion.div>
+
+      {/* Tech name */}
+      <p
+        className={`
+          text-xs font-bold text-center uppercase tracking-tight
+          transition-colors duration-300
+          ${isActive ? 'text-cyan-400' : 'text-white/70 group-hover:text-white'}
+        `}
+      >
+        {tech.name}
+      </p>
+
+      {/* Category badge */}
+      <motion.div
+        className="mt-2 text-[10px] text-center uppercase tracking-wider"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 + (index * 0.03) }}
+      >
+        <span
+          className={`
+            px-2 py-0.5 rounded-full
+            transition-all duration-300
+            ${isActive 
+              ? 'bg-cyan-500/30 text-cyan-300' 
+              : 'bg-white/5 text-white/40 group-hover:text-white/60'
+            }
+          `}
+        >
+          {tech.category}
+        </span>
+      </motion.div>
+
+      {/* Hover shine effect */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        style={{
+          background: `linear-gradient(135deg, transparent 0%, ${tech.color}10 50%, transparent 100%)`,
+        }}
+      />
+
+      {/* Active indicator */}
+      {isActive && (
+        <motion.div
+          className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-400"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+        >
+          <motion.div
+            className="absolute inset-0 rounded-full bg-cyan-400"
+            animate={{ scale: [1, 1.5, 1], opacity: [1, 0, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 
