@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect } from "react";
+import { useRef, useState, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Sphere, MeshDistortMaterial, Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
@@ -45,14 +45,13 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    // Smooth floating animation
-    groupRef.current.position.y = position[1] + Math.sin(time * 0.5 + index) * 0.3;
-    // Slow rotation of the whole group (sphere + icon)
-    groupRef.current.rotation.y = time * 0.1 + index;
+    // Gentle floating animation only
+    groupRef.current.position.y = position[1] + Math.sin(time * 0.4 + index * 0.5) * 0.2;
+    groupRef.current.position.x = position[0] + Math.cos(time * 0.3 + index * 0.3) * 0.15;
   });
 
   return (
-    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
+    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
       <group
         ref={groupRef}
         position={position}
@@ -61,36 +60,36 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
       >
         {/* Outer glow sphere */}
         <mesh>
-          <sphereGeometry args={[0.7, 32, 32]} />
+          <sphereGeometry args={[0.85, 32, 32]} />
           <meshBasicMaterial
             color={tech.color}
             transparent
-            opacity={hovered ? 0.15 : 0.05}
+            opacity={hovered ? 0.2 : 0.06}
             side={THREE.BackSide}
           />
         </mesh>
         
         {/* Main sphere */}
         <mesh>
-          <sphereGeometry args={[0.55, 32, 32]} />
+          <sphereGeometry args={[0.65, 32, 32]} />
           <MeshDistortMaterial
-            color={hovered ? tech.color : "#0a0a0a"}
-            speed={1.5}
-            distort={0.2}
+            color={hovered ? tech.color : "#0f0f0f"}
+            speed={1}
+            distort={0.15}
             radius={1}
             emissive={tech.color}
-            emissiveIntensity={hovered ? 0.8 : 0.1}
+            emissiveIntensity={hovered ? 0.9 : 0.15}
             transparent
-            opacity={hovered ? 0.6 : 0.3}
-            metalness={0.8}
-            roughness={0.2}
+            opacity={hovered ? 0.7 : 0.35}
+            metalness={0.9}
+            roughness={0.1}
           />
         </mesh>
         
-        {/* Icon */}
+        {/* Icon - always facing camera */}
         <Html
           center
-          distanceFactor={6}
+          distanceFactor={5.5}
           position={[0, 0, 0]}
           style={{
             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -101,10 +100,10 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
           <motion.div
             animate={{ 
               rotate: 360,
-              scale: hovered ? 1.2 : 1,
+              scale: hovered ? 1.3 : 1,
             }}
             transition={{ 
-              rotate: { duration: 6, repeat: Infinity, ease: "linear" },
+              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
               scale: { duration: 0.3 }
             }}
             style={{ 
@@ -116,10 +115,10 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
             <IconComponent 
               style={{ 
                 color: hovered ? tech.color : '#ffffff', 
-                fontSize: '48px',
+                fontSize: '52px',
                 filter: hovered 
-                  ? `drop-shadow(0 0 20px ${tech.color}) drop-shadow(0 0 40px ${tech.color})` 
-                  : 'drop-shadow(0 0 8px rgba(255,255,255,0.3))',
+                  ? `drop-shadow(0 0 24px ${tech.color}) drop-shadow(0 0 48px ${tech.color})` 
+                  : 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
               }} 
             />
@@ -134,13 +133,17 @@ const SkillNeuralNetwork = () => {
   const [activeTech, setActiveTech] = useState<any>(null);
   const techPositions = useMemo(() => {
     return technologies.map((_, i) => {
-      // Better spherical distribution with more spacing
-      const phi = Math.acos(-1 + (2 * i) / technologies.length);
-      const theta = Math.sqrt(technologies.length * Math.PI) * phi;
-      const radius = 7.5; // Even more spacing
+      // Fibonacci sphere distribution for even spacing
+      const goldenRatio = (1 + Math.sqrt(5)) / 2;
+      const goldenAngle = 2 * Math.PI / (goldenRatio * goldenRatio);
+      
+      const theta = goldenAngle * i;
+      const phi = Math.acos(1 - 2 * (i + 0.5) / technologies.length);
+      const radius = 9; // Increased radius for better spacing
+      
       return [
-        radius * Math.cos(theta) * Math.sin(phi),
-        radius * Math.sin(theta) * Math.sin(phi),
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.sin(phi) * Math.sin(theta),
         radius * Math.cos(phi)
       ] as [number, number, number];
     });
@@ -148,20 +151,23 @@ const SkillNeuralNetwork = () => {
 
   return (
     <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5 cursor-move">
-      <Canvas camera={{ position: [0, 0, 20], fov: 50 }}>
-        <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={50} />
+      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
+        <PerspectiveCamera makeDefault position={[0, 0, 22]} fov={45} />
         <OrbitControls 
           enableZoom={true} 
           autoRotate 
-          autoRotateSpeed={0.15}
-          minDistance={15}
-          maxDistance={30}
+          autoRotateSpeed={0.25}
+          minDistance={18}
+          maxDistance={35}
           enablePan={false}
+          dampingFactor={0.05}
+          rotateSpeed={0.5}
         />
-        <ambientLight intensity={0.4} />
-        <pointLight position={[15, 15, 15]} intensity={2} color="#00ffc8" />
-        <pointLight position={[-15, -15, -15]} intensity={1.2} color="#ff6b6b" />
-        <pointLight position={[0, 0, 15]} intensity={1.5} color="#4ECDC4" />
+        <ambientLight intensity={0.5} />
+        <pointLight position={[20, 20, 20]} intensity={2.5} color="#00ffc8" />
+        <pointLight position={[-20, -20, -20]} intensity={1.5} color="#ff6b6b" />
+        <pointLight position={[0, 0, 20]} intensity={2} color="#4ECDC4" />
+        <spotLight position={[0, 25, 0]} intensity={1.5} angle={0.5} penumbra={1} color="#ffffff" />
         
         {technologies.map((tech, i) => (
           <TechNode 
@@ -172,33 +178,15 @@ const SkillNeuralNetwork = () => {
             onHover={setActiveTech}
           />
         ))}
-
-        {/* Connection lines with gradient */}
-        {techPositions.map((pos, i) => {
-          if (i >= techPositions.length - 1) return null;
-          return (
-            <line key={`line-${i}`}>
-              <bufferGeometry>
-                <bufferAttribute
-                  attach="attributes-position"
-                  count={2}
-                  array={new Float32Array([...pos, 0, 0, 0])}
-                  itemSize={3}
-                />
-              </bufferGeometry>
-              <lineBasicMaterial color="#00ffc8" opacity={0.08} transparent />
-            </line>
-          );
-        })}
         
-        {/* Central core */}
-        <Sphere args={[1, 32, 32]} position={[0, 0, 0]}>
+        {/* Central core with pulsing effect */}
+        <Sphere args={[1.2, 32, 32]} position={[0, 0, 0]}>
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
-            emissiveIntensity={0.4}
+            emissiveIntensity={0.5}
             transparent
-            opacity={0.15}
+            opacity={0.2}
             wireframe
           />
         </Sphere>
