@@ -294,23 +294,24 @@ const TechStackSection = () => {
           <SkillNeuralNetwork />
         </motion.div>
 
-        {/* Tech Icons Grid */}
+        {/* Tech Icons Grid - Simple */}
         <motion.div
-          className="mt-16"
+          className="mt-20"
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-2xl font-bold text-white uppercase tracking-tight">
-              Technology Stack
+          <div className="flex items-center justify-center mb-12">
+            <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent/30" />
+            <h3 className="mx-6 text-sm font-bold text-white/50 uppercase tracking-[0.3em]">
+              Tech Stack
             </h3>
-            <div className="h-px flex-1 ml-8 bg-gradient-to-r from-accent/30 to-transparent" />
+            <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent/30" />
           </div>
 
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
             {technologies.map((tech, i) => (
-              <TechIconCard key={tech.name} tech={tech} index={i} isInView={isInView} />
+              <TechIcon key={tech.name} tech={tech} index={i} isInView={isInView} />
             ))}
           </div>
         </motion.div>
@@ -319,117 +320,89 @@ const TechStackSection = () => {
   );
 };
 
-const TechIconCard = ({ tech, index, isInView }: any) => {
+const TechIcon = ({ tech, index, isInView }: any) => {
   const [isActive, setIsActive] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const IconComponent = tech.icon;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30, scale: 0.8 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 30, scale: 0.8 }}
-      exit={{ opacity: 0, scale: 0.8, y: -20 }}
+      initial={{ opacity: 0, scale: 0, rotate: -180 }}
+      animate={isInView ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0, rotate: -180 }}
+      exit={{ opacity: 0, scale: 0, rotate: 180 }}
       transition={{
-        duration: 0.5,
-        delay: 0.6 + (index * 0.03),
+        duration: 0.6,
+        delay: 0.5 + (index * 0.04),
         ease: [0.16, 1, 0.3, 1],
       }}
-      whileHover={{ y: -8, scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.2, y: -8 }}
+      whileTap={{ scale: 0.9 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
       onClick={() => setIsActive(!isActive)}
-      className={`
-        group relative p-6 rounded-2xl cursor-pointer
-        transition-all duration-300
-        ${isActive 
-          ? 'bg-cyan-500/20 border-cyan-400/50' 
-          : 'bg-white/5 border-white/10 hover:border-white/20'
-        }
-        border backdrop-blur-sm
-      `}
+      className="relative cursor-pointer group"
     >
-      {/* Background glow on active */}
+      {/* Glow effect on hover or active */}
       <motion.div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isActive ? 1 : 0 }}
+        className="absolute inset-0 rounded-full blur-xl"
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ 
+          opacity: (isHovered || isActive) ? 0.6 : 0,
+          scale: (isHovered || isActive) ? 1.5 : 0.5,
+        }}
         transition={{ duration: 0.3 }}
         style={{
-          background: `radial-gradient(circle at center, rgba(34, 211, 238, 0.15), transparent)`,
-          boxShadow: isActive ? '0 0 30px rgba(34, 211, 238, 0.3)' : 'none',
+          background: (isHovered || isActive) ? 'rgba(34, 211, 238, 0.5)' : 'transparent',
         }}
       />
 
-      {/* Icon with rotation on hover */}
+      {/* Icon with rotation */}
       <motion.div
-        className="flex items-center justify-center mb-3"
-        whileHover={{ rotate: 360 }}
+        animate={{ rotate: isHovered ? 360 : 0 }}
         transition={{ duration: 0.6, ease: 'easeInOut' }}
+        className="relative"
       >
         <IconComponent
-          className="w-10 h-10 transition-all duration-300"
+          className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300"
           style={{
-            color: isActive ? '#22d3ee' : tech.color,
-            filter: isActive 
-              ? 'drop-shadow(0 0 12px rgba(34, 211, 238, 0.8))' 
-              : `drop-shadow(0 0 6px ${tech.color}40)`,
+            color: (isHovered || isActive) ? '#22d3ee' : tech.color,
+            filter: (isHovered || isActive)
+              ? 'drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)) drop-shadow(0 0 32px rgba(34, 211, 238, 0.4))' 
+              : `drop-shadow(0 0 8px ${tech.color}60)`,
           }}
         />
       </motion.div>
 
-      {/* Tech name */}
-      <p
-        className={`
-          text-xs font-bold text-center uppercase tracking-tight
-          transition-colors duration-300
-          ${isActive ? 'text-cyan-400' : 'text-white/70 group-hover:text-white'}
-        `}
-      >
-        {tech.name}
-      </p>
-
-      {/* Category badge */}
+      {/* Tooltip on hover */}
       <motion.div
-        className="mt-2 text-[10px] text-center uppercase tracking-wider"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 + (index * 0.03) }}
+        className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : -10 }}
+        transition={{ duration: 0.2 }}
       >
-        <span
-          className={`
-            px-2 py-0.5 rounded-full
-            transition-all duration-300
-            ${isActive 
-              ? 'bg-cyan-500/30 text-cyan-300' 
-              : 'bg-white/5 text-white/40 group-hover:text-white/60'
-            }
-          `}
-        >
-          {tech.category}
-        </span>
+        <div className="px-3 py-1.5 rounded-lg bg-black/90 backdrop-blur-md border border-cyan-400/30">
+          <p className="text-xs font-bold text-cyan-400">{tech.name}</p>
+        </div>
       </motion.div>
 
-      {/* Hover shine effect */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        style={{
-          background: `linear-gradient(135deg, transparent 0%, ${tech.color}10 50%, transparent 100%)`,
-        }}
-      />
-
-      {/* Active indicator */}
+      {/* Active ring indicator */}
       {isActive && (
         <motion.div
-          className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-cyan-400"
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          exit={{ scale: 0 }}
-          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-        >
-          <motion.div
-            className="absolute inset-0 rounded-full bg-cyan-400"
-            animate={{ scale: [1, 1.5, 1], opacity: [1, 0, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.div>
+          className="absolute inset-0 rounded-full border-2 border-cyan-400"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1.3, opacity: 0 }}
+          transition={{ duration: 1, repeat: Infinity }}
+        />
+      )}
+
+      {/* Hover ring pulse */}
+      {isHovered && (
+        <motion.div
+          className="absolute inset-0 rounded-full border-2 border-cyan-400/50"
+          initial={{ scale: 1, opacity: 0.5 }}
+          animate={{ scale: 1.5, opacity: 0 }}
+          transition={{ duration: 0.8, repeat: Infinity }}
+        />
       )}
     </motion.div>
   );
