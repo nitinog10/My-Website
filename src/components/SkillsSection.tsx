@@ -1,294 +1,186 @@
-import { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Brain, Code, Layers, Database, Cloud, Sparkles, Zap, Cpu } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
-gsap.registerPlugin(ScrollTrigger);
-
-const skillCategories = [
+const skillGroups = [
   {
-    id: 'ai',
-    title: 'AI & ML',
-    subtitle: 'Artificial Intelligence',
-    icon: Brain,
-    color: '#FF6B6B',
-    bgImage: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    skills: [
-      'Generative AI & LLMs',
-      'Computer Vision',
-      'NLP & Fine-Tuning',
-      'Multi-Agent Systems',
-      'PyTorch & TensorFlow',
-      'Transformers & Keras'
-    ]
+    category: 'CORE AI & ML',
+    skills: ['Generative AI (LLMs, Prompt Engineering, RAG)', 'Computer Vision (OpenCV, Object Detection, Segmentation)', 'NLP & Model Fine-Tuning', 'Intelligent Agents & Multi-Agent Systems']
   },
   {
-    id: 'fullstack',
-    title: 'Full-Stack',
-    subtitle: 'Web Development',
-    icon: Code,
-    color: '#4ECDC4',
-    bgImage: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    skills: [
-      'React & Next.js',
-      'Node.js & FastAPI',
-      'TypeScript',
-      'Tailwind CSS',
-      'GSAP Animations',
-      'Three.js & WebGL'
-    ]
+    category: 'ENGINEERING & ARCHITECTURE',
+    skills: ['Full-Stack Development (Next.js, React)', 'Backend APIs (Node.js, FastAPI)', 'Scalable AI System Design', 'MCP Servers & AI Infrastructure', 'Cloud-Native Development']
   },
   {
-    id: 'architecture',
-    title: 'Architecture',
-    subtitle: 'System Design',
-    icon: Layers,
-    color: '#45B7D1',
-    bgImage: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    skills: [
-      'Scalable Systems',
-      'Microservices',
-      'API Design',
-      'MCP Servers',
-      'Cloud-Native',
-      'CI/CD Pipelines'
-    ]
+    category: 'TOOLS & PLATFORMS',
+    skills: ['PyTorch', 'TensorFlow', 'Hugging Face', 'Docker', 'Firebase', 'Google Cloud', 'Three.js / Web-based 3D', 'Git', 'CI/CD Pipelines']
   },
   {
-    id: 'data',
-    title: 'Data Eng',
-    subtitle: 'Data Engineering',
-    icon: Database,
-    color: '#95E1D3',
-    bgImage: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    skills: [
-      'Pandas & NumPy',
-      'Data Pipelines',
-      'MongoDB & PostgreSQL',
-      'Vector Databases',
-      'ETL Processes',
-      'Data Visualization'
-    ]
-  },
-  {
-    id: 'cloud',
-    title: 'Cloud & DevOps',
-    subtitle: 'Infrastructure',
-    icon: Cloud,
-    color: '#FFA502',
-    bgImage: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    skills: [
-      'AWS & GCP',
-      'Docker & Kubernetes',
-      'Serverless',
-      'Infrastructure as Code',
-      'Monitoring',
-      'Git & Version Control'
-    ]
+    category: 'CURRENT FOCUS',
+    skills: ['Advanced Computer Vision Techniques', 'RAG Systems & Knowledge-Grounded AI', 'Building Production-Grade AI Systems', 'Exploring AI + 3D + Web Experiences']
   }
 ];
 
-const SkillCard = ({ category, index }: any) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const IconComponent = category.icon;
+// 3D Card component with parallax hover and timeline layout
+const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: number }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+  const isLeft = index % 2 === 0;
+  
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"]
+  });
+  
+  const xOffset = isLeft ? -80 : 80;
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const x = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [xOffset, 0, 0, -xOffset]);
+  const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    setRotateX(-mouseY / 20);
+    setRotateY(mouseX / 20);
+  };
+
+  const handleMouseLeave = () => {
+    setRotateX(0);
+    setRotateY(0);
+  };
 
   return (
-    <motion.div
-      className="flex-shrink-0 w-[400px] h-[500px] relative group cursor-pointer"
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ scale: 1.05, y: -10 }}
-      transition={{ duration: 0.3 }}
-    >
-      {/* Card */}
-      <div className="relative w-full h-full rounded-3xl overflow-hidden">
-        {/* Background gradient */}
-        <div 
-          className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-500"
-          style={{ background: category.bgImage }}
-        />
-        
-        {/* Glass effect */}
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+    <div ref={cardRef} className="relative">
+      {/* Timeline point */}
+      <motion.div
+        className="absolute left-1/2 top-6 -translate-x-1/2 z-10 hidden md:flex items-center justify-center"
+        style={{ opacity }}
+      >
+        <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,255,200,0.6)]" />
+      </motion.div>
 
-        {/* Border glow */}
-        <div 
-          className="absolute inset-0 rounded-3xl"
-          style={{
-            border: `2px solid ${isHovered ? category.color + '80' : category.color + '30'}`,
-            boxShadow: isHovered ? `0 0 40px ${category.color}40, inset 0 0 40px ${category.color}10` : 'none',
-            transition: 'all 0.3s',
-          }}
-        />
-
-        {/* Content */}
-        <div className="relative h-full p-8 flex flex-col">
-          {/* Icon */}
-          <motion.div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
+      {/* Card container - alternating sides */}
+      <div className={`flex ${isLeft ? 'md:justify-start' : 'md:justify-end'} justify-center`}>
+        <motion.div
+          className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
+          style={{ opacity, x, scale }}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+        >
+          {/* Connector line */}
+          <div
+            className={`absolute top-8 ${isLeft ? 'right-0' : 'left-0'} w-12 h-px hidden md:block`}
             style={{
-              background: `${category.color}20`,
-              border: `1px solid ${category.color}40`,
+              background: isLeft 
+                ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.3))' 
+                : 'linear-gradient(to left, transparent, rgba(0,255,200,0.3))'
             }}
-            animate={isHovered ? { rotate: [0, 360] } : { rotate: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <IconComponent 
-              className="w-10 h-10"
-              style={{ 
-                color: category.color,
-                filter: `drop-shadow(0 0 10px ${category.color})`,
-              }}
-            />
-          </motion.div>
+          />
 
-          {/* Title */}
-          <div className="mb-6">
-            <h3 
-              className="text-4xl font-black uppercase tracking-tight mb-2"
-              style={{ color: category.color }}
-            >
-              {category.title}
+          {/* Card */}
+          <motion.div
+            className="group relative rounded-2xl p-5 md:p-6 transition-all duration-300 ease-out overflow-hidden"
+            style={{
+              rotateX,
+              rotateY,
+              transformStyle: 'preserve-3d',
+              background: 'rgba(17, 17, 20, 0.9)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
+            }}
+            whileHover={{
+              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+              border: '1px solid rgba(255,255,255,0.12)'
+            }}
+          >
+            {/* Top accent border */}
+            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
+            
+            {/* Index number */}
+            <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              0{index + 1}
+            </span>
+            
+            {/* Category header */}
+            <h3 className="text-lg md:text-xl font-bold text-white mb-3 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+              {group.category.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
             </h3>
-            <p className="text-white/50 text-sm uppercase tracking-wider">
-              {category.subtitle}
-            </p>
-          </div>
 
-          {/* Skills */}
-          <div className="flex-1 space-y-3">
-            {category.skills.map((skill: string, i: number) => (
-              <motion.div
-                key={skill}
-                className="flex items-center gap-3 p-3 rounded-xl backdrop-blur-sm"
-                style={{
-                  background: isHovered ? `${category.color}10` : 'rgba(255,255,255,0.03)',
-                  border: `1px solid ${isHovered ? category.color + '30' : 'rgba(255,255,255,0.05)'}`,
-                }}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <motion.div
-                  className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: category.color }}
-                  animate={isHovered ? { scale: [1, 1.5, 1] } : {}}
-                  transition={{ duration: 1, repeat: Infinity }}
-                />
-                <span className="text-sm text-white/80">{skill}</span>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Number */}
-          <div 
-            className="absolute bottom-8 right-8 text-8xl font-black opacity-10"
-            style={{ color: category.color }}
-          >
-            0{index + 1}
-          </div>
-        </div>
+            {/* Skills list */}
+            <div className="space-y-2" style={{ transform: 'translateZ(10px)' }}>
+              {group.skills.map((skill) => (
+                <div key={skill} className="group/skill">
+                  <span className="text-sm text-white/50 group-hover/skill:text-white/80 transition-colors duration-300 leading-relaxed block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                    {skill}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </motion.div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 const SkillsSection = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: containerRef });
-  
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-70%']);
-
-  useEffect(() => {
-    if (!scrollRef.current || !containerRef.current) return;
-
-    const ctx = gsap.context(() => {
-      const scrollWidth = scrollRef.current!.scrollWidth;
-      const windowWidth = window.innerWidth;
-
-      gsap.to(scrollRef.current, {
-        x: -(scrollWidth - windowWidth),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: () => `+=${scrollWidth}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-    });
-
-    return () => ctx.revert();
-  }, []);
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { once: false, margin: "-10%" });
 
   return (
-    <section ref={containerRef} className="relative h-[200vh] bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
-        
-        {/* Animated grid */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(rgba(0,255,200,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,200,0.1) 1px, transparent 1px)',
-            backgroundSize: '50px 50px',
-          }} />
-        </div>
-
-        {/* Title - Fixed on left */}
-        <div className="absolute left-12 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+    <section ref={ref} className="min-h-screen py-32 md:py-48 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Section header */}
+        <div className="grid grid-cols-12 gap-4 mb-20">
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1 }}
+            className="col-span-12 md:col-span-2"
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block">
-              002 — CAPABILITIES
-            </span>
-            <h2 className="text-[clamp(3rem, 8vw, 6rem)] font-black uppercase tracking-tighter leading-[0.85] text-white">
-              WHAT I<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
-                WORK WITH
-              </span>
-            </h2>
-            <div className="flex items-center gap-4 mt-8">
-              <div className="h-px w-16 bg-accent" />
-              <span className="text-sm text-white/60 uppercase tracking-wider">Scroll horizontally</span>
-            </div>
+            <span className="text-xs md:text-sm tracking-[0.2em] text-white/30 uppercase">002</span>
+            <span className="block text-xs md:text-sm tracking-[0.3em] text-accent uppercase mt-4">CAPABILITIES</span>
           </motion.div>
-        </div>
 
-        {/* Horizontal scroll container */}
-        <div className="absolute inset-0 flex items-center">
-          <motion.div
-            ref={scrollRef}
-            className="flex gap-8 px-[50vw] py-20"
-            style={{ x }}
-          >
-            {skillCategories.map((category, index) => (
-              <SkillCard key={category.id} category={category} index={index} />
-            ))}
-            
-            {/* End spacer */}
-            <div className="w-[40vw] flex-shrink-0" />
-          </motion.div>
-        </div>
-
-        {/* Progress indicator */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20">
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-white/50 uppercase tracking-wider">Progress</span>
-            <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-accent"
-                style={{ scaleX: scrollYProgress, transformOrigin: 'left' }}
+          <div className="col-span-12 md:col-span-10 md:col-start-3">
+            <div className="flex items-center gap-6">
+              <motion.h2
+                className="text-[clamp(2.5rem,8vw,6rem)] font-bold text-white uppercase tracking-tighter leading-[0.85]"
+                style={{ fontFamily: 'var(--font-heading)' }}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              >
+                WHAT I<br />
+                <span className="text-white/20">WORK WITH</span>
+              </motion.h2>
+              <motion.img
+                src="/nodejs.png"
+                alt="nodejs sticker"
+                className="hidden md:block flex-shrink-0"
+                style={{ height: 'clamp(100px, 13vw, 180px)', width: 'auto', opacity: 0.9, borderRadius: '12px' }}
+                initial={{ opacity: 0, x: 30 }}
+                animate={isInView ? { opacity: 0.9, x: 0 } : { opacity: 0, x: 30 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
               />
             </div>
+          </div>
+        </div>
+
+        {/* Skills with timeline */}
+        <div className="relative">
+          {/* Skills cards */}
+          <div className="space-y-12 md:space-y-16">
+            {skillGroups.map((group, index) => (
+              <SkillCard key={group.category} group={group} index={index} />
+            ))}
           </div>
         </div>
       </div>
