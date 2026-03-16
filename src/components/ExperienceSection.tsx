@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useInView } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -49,6 +49,100 @@ const experiences = [
     tags: ["AIML", "Engineering", "Core"]
   }
 ];
+
+const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: number }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotateX, setRotateX] = useState(0);
+  const [rotateY, setRotateY] = useState(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    
+    const rect = card.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const mouseX = e.clientX - centerX;
+    const mouseY = e.clientY - centerY;
+    
+    setRotateX(-mouseY / 20);
+    setRotateY(mouseX / 20);
+  };
+
+  const handleMouseLeave = () => {
+    setRotateX(0);
+    setRotateY(0);
+  };
+
+  return (
+    <div className="min-w-[80vw] md:min-w-[45vw] lg:min-w-[35vw] flex items-center">
+      <motion.div
+        ref={cardRef}
+        className="group relative w-full rounded-2xl p-6 md:p-8 mx-4 transition-all duration-300 ease-out overflow-hidden"
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+          background: 'rgba(17, 17, 20, 0.9)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        whileHover={{
+          boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(255,255,255,0.12)'
+        }}
+      >
+        {/* Top accent border */}
+        <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
+        
+        {/* Index number */}
+        <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          0{index + 1}
+        </span>
+        
+        {/* Period badge */}
+        <div className="flex items-center justify-between mb-6">
+          <span className="text-accent text-xs font-black tracking-[0.3em] uppercase py-1 px-3 border border-accent/20 rounded-full">
+            {exp.period}
+          </span>
+          <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+        </div>
+
+        {/* Role */}
+        <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+          {exp.role}
+        </h3>
+        
+        {/* Company */}
+        <p className="text-accent text-sm uppercase tracking-wider font-medium mb-6" style={{ transform: 'translateZ(15px)' }}>
+          @ {exp.company}
+        </p>
+
+        {/* Description */}
+        <p className="text-white/50 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
+          {exp.description}
+        </p>
+        
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2" style={{ transform: 'translateZ(5px)' }}>
+          {exp.tags.map(tag => (
+            <span 
+              key={tag} 
+              className="text-xs text-white/40 uppercase tracking-wider px-3 py-1.5 border border-white/10 rounded-full hover:border-accent/40 hover:text-accent/60 transition-all"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Bottom progress line */}
+        <div className="absolute bottom-0 left-0 h-1 bg-accent/30 w-0 group-hover:w-full transition-all duration-700" />
+      </motion.div>
+    </div>
+  );
+};
 
 const ExperienceSection = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -104,51 +198,7 @@ const ExperienceSection = () => {
 
           {/* Experience cards */}
           {experiences.map((exp, i) => (
-            <div key={i} className="min-w-[80vw] md:min-w-[45vw] lg:min-w-[35vw] flex items-center">
-              <div className="experience-card group relative w-full h-[500px] bg-[#111] rounded-[40px] p-8 md:p-12 border border-white/5 mx-4 flex flex-col justify-between hover:bg-[#161618] transition-all duration-500 overflow-hidden shadow-2xl">
-                
-                {/* Visual accents */}
-                <div className="absolute top-0 right-0 w-[40%] h-[40%] bg-accent/5 blur-[80px] pointer-events-none group-hover:bg-accent/10 transition-colors" />
-                <div className="absolute -bottom-12 -right-12 text-[180px] leading-none font-black text-white/[0.02] uppercase pointer-events-none tracking-tighter grayscale italic select-none">
-                  {i + 1}
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <span className="text-accent text-[10px] md:text-xs font-black tracking-[0.4em] uppercase py-1 border-b border-accent/20">
-                       {exp.period}
-                    </span>
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-                  </div>
-
-                  <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-none mb-4 group-hover:translate-x-2 transition-transform duration-500 delay-75">
-                    {exp.role.split(' ')[0]}<br />
-                    <span className="text-white/40">{exp.role.split(' ').slice(1).join(' ')}</span>
-                  </h3>
-                  
-                  <p className="text-accent text-sm md:text-md uppercase tracking-[0.1em] font-medium mb-8">
-                    @{exp.company}
-                  </p>
-                </div>
-
-                <div className="relative z-10">
-                  <p className="text-white/40 text-sm md:text-md leading-relaxed max-w-sm mb-8">
-                    {exp.description}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {exp.tags.map(tag => (
-                      <span key={tag} className="text-[9px] text-white/20 uppercase tracking-[0.2em] px-3 py-1.5 border border-white/10 rounded-full group-hover:border-accent/40 group-hover:text-accent/60 transition-all">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Bottom line progress simulator */}
-                <div className="absolute bottom-0 left-0 h-1 bg-accent/30 w-0 group-hover:w-full transition-all duration-700" />
-              </div>
-            </div>
+            <ExperienceCard key={i} exp={exp} index={i} />
           ))}
 
           {/* End marker */}
