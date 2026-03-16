@@ -89,27 +89,54 @@ const SkillCard = ({ category, index, isInView }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const IconComponent = category.icon;
 
+  // Diagonal pattern: 0,1,2,3,4 -> top-left, bottom-right, top-right, bottom-left, center
+  const getEntryDirection = (idx: number) => {
+    const patterns = [
+      { x: -100, y: -100 }, // top-left
+      { x: 100, y: 100 },   // bottom-right
+      { x: 100, y: -100 },  // top-right
+      { x: -100, y: 100 },  // bottom-left
+      { x: 0, y: -100 },    // top-center
+    ];
+    return patterns[idx % patterns.length];
+  };
+
+  const direction = getEntryDirection(index);
+
   useEffect(() => {
     if (!cardRef.current) return;
 
-    gsap.fromTo(
-      cardRef.current,
-      { opacity: 0, y: 60, rotateX: -15 },
-      {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.8,
-        delay: index * 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: cardRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none reverse',
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        cardRef.current,
+        { 
+          opacity: 0, 
+          x: direction.x,
+          y: direction.y,
+          scale: 0.8,
+          rotateZ: direction.x > 0 ? 15 : -15,
         },
-      }
-    );
-  }, [index]);
+        {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotateZ: 0,
+          duration: 1,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: 'top 85%',
+            end: 'top 20%',
+            toggleActions: 'play none none reverse',
+            scrub: 1,
+          },
+        }
+      );
+    });
+
+    return () => ctx.revert();
+  }, [index, direction.x, direction.y]);
 
   return (
     <motion.div
@@ -117,7 +144,7 @@ const SkillCard = ({ category, index, isInView }: any) => {
       className="group relative"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -8, scale: 1.02 }}
       transition={{ duration: 0.3 }}
     >
       <div
@@ -196,8 +223,9 @@ const SkillCard = ({ category, index, isInView }: any) => {
                 border: `1px solid ${isHovered ? category.color + '20' : 'transparent'}`,
               }}
               initial={{ opacity: 0, x: -20 }}
-              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-              transition={{ delay: 0.5 + index * 0.15 + i * 0.05 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: false, margin: '-50px' }}
+              transition={{ delay: i * 0.05, duration: 0.4 }}
             >
               <motion.div
                 className="w-2 h-2 rounded-full flex-shrink-0"
