@@ -266,35 +266,52 @@ const TechCard = ({ tech, index }: any) => {
         {/* Ripple effect on hover */}
         {hovered && (
           <>
+            {/* Single expanding ring */}
             <motion.div
-              className="absolute inset-0 rounded-full border-2 pointer-events-none"
-              style={{ borderColor: tech.color }}
-              initial={{ scale: 0.8, opacity: 0.8 }}
+              className="absolute inset-0 rounded-full border pointer-events-none"
+              style={{ borderColor: tech.color + '60' }}
+              initial={{ scale: 1, opacity: 0.6 }}
               animate={{
-                scale: [0.8, 1.5, 2],
-                opacity: [0.8, 0.4, 0],
+                scale: [1, 1.8],
+                opacity: [0.6, 0],
               }}
               transition={{
-                duration: 1.5,
+                duration: 1.2,
                 repeat: Infinity,
                 ease: "easeOut"
               }}
             />
-            <motion.div
-              className="absolute inset-0 rounded-full border-2 pointer-events-none"
-              style={{ borderColor: tech.color }}
-              initial={{ scale: 0.8, opacity: 0.8 }}
-              animate={{
-                scale: [0.8, 1.5, 2],
-                opacity: [0.8, 0.4, 0],
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeOut",
-                delay: 0.5
-              }}
-            />
+            
+            {/* Rotating particles */}
+            {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+              <motion.div
+                key={angle}
+                className="absolute w-1 h-1 rounded-full pointer-events-none"
+                style={{
+                  backgroundColor: tech.color,
+                  left: '50%',
+                  top: '50%',
+                  boxShadow: `0 0 8px ${tech.color}`,
+                }}
+                initial={{ 
+                  x: '-50%', 
+                  y: '-50%',
+                  scale: 0
+                }}
+                animate={{
+                  x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 30}px)`,
+                  y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 30}px)`,
+                  scale: [0, 1, 0],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeOut",
+                  delay: i * 0.1
+                }}
+              />
+            ))}
           </>
         )}
       </div>
