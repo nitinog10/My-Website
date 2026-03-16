@@ -103,6 +103,14 @@ export default {
           "0%": { width: "0" },
           "100%": { width: "100%" },
         },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "spin-reverse": {
+          "0%": { transform: "rotate(360deg)" },
+          "100%": { transform: "rotate(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -113,6 +121,8 @@ export default {
         "slide-in-right": "slide-in-right 0.8s ease-out forwards",
         "scale-in": "scale-in 0.6s ease-out forwards",
         "line-expand": "line-expand 1s ease-out forwards",
+        "spin-slow": "spin-slow 20s linear infinite",
+        "spin-reverse": "spin-reverse 15s linear infinite",
       },
     },
   },
