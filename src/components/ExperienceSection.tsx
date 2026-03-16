@@ -23,7 +23,7 @@ const experiences = [
   {
     role: "INTERN",
     company: "ENTOPLEARNING.COM",
-    period: "2024",
+    period: "2026",
     description: "Built the foundational LMS modules, focus on core backend performance and scalable educational infrastructure.",
     tags: ["Backend", "LMS", "Python"]
   },
