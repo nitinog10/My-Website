@@ -45,8 +45,10 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    // Smooth floating animation only
+    // Smooth floating animation
     groupRef.current.position.y = position[1] + Math.sin(time * 0.5 + index) * 0.3;
+    // Slow rotation of the whole group (sphere + icon)
+    groupRef.current.rotation.y = time * 0.1 + index;
   });
 
   return (
@@ -132,9 +134,10 @@ const SkillNeuralNetwork = () => {
   const [activeTech, setActiveTech] = useState<any>(null);
   const techPositions = useMemo(() => {
     return technologies.map((_, i) => {
+      // Better spherical distribution
       const phi = Math.acos(-1 + (2 * i) / technologies.length);
       const theta = Math.sqrt(technologies.length * Math.PI) * phi;
-      const radius = 5;
+      const radius = 6; // Increased radius for better spacing
       return [
         radius * Math.cos(theta) * Math.sin(phi),
         radius * Math.sin(theta) * Math.sin(phi),
@@ -145,14 +148,14 @@ const SkillNeuralNetwork = () => {
 
   return (
     <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5 cursor-move">
-      <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+        <PerspectiveCamera makeDefault position={[0, 0, 18]} fov={45} />
         <OrbitControls 
           enableZoom={true} 
           autoRotate 
-          autoRotateSpeed={0.3}
-          minDistance={10}
-          maxDistance={20}
+          autoRotateSpeed={0.2}
+          minDistance={12}
+          maxDistance={25}
           enablePan={false}
         />
         <ambientLight intensity={0.3} />
