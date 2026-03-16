@@ -50,34 +50,48 @@ const TechNode = ({ tech, position, onHover }: any) => {
     >
       {/* Glowing sphere */}
       <mesh>
-        <sphereGeometry args={[0.5, 32, 32]} />
+        <sphereGeometry args={[0.6, 32, 32]} />
         <meshStandardMaterial
           color={tech.color}
           emissive={tech.color}
-          emissiveIntensity={hovered ? 2 : 0.8}
+          emissiveIntensity={hovered ? 2.5 : 1.2}
           transparent
-          opacity={hovered ? 0.95 : 0.6}
+          opacity={hovered ? 1 : 0.7}
         />
       </mesh>
       
-      {/* Icon */}
+      {/* Icon - much larger and clearer */}
       <Html
         center
-        distanceFactor={2}
+        distanceFactor={1.2}
         position={[0, 0, 0]}
         style={{
           transition: 'all 0.3s ease',
           pointerEvents: 'none',
         }}
       >
-        <IconComponent 
-          style={{ 
-            color: '#ffffff', 
-            fontSize: hovered ? '64px' : '56px',
-            filter: hovered ? `drop-shadow(0 0 24px ${tech.color})` : `drop-shadow(0 0 8px rgba(255,255,255,0.5))`,
-            transition: 'all 0.3s ease',
-          }} 
-        />
+        <div style={{
+          background: hovered ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)',
+          borderRadius: '50%',
+          padding: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backdropFilter: 'blur(10px)',
+          border: `2px solid ${hovered ? tech.color : 'rgba(255,255,255,0.2)'}`,
+          transition: 'all 0.3s ease',
+        }}>
+          <IconComponent 
+            style={{ 
+              color: hovered ? tech.color : '#ffffff', 
+              fontSize: hovered ? '80px' : '72px',
+              filter: hovered 
+                ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
+                : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
+              transition: 'all 0.3s ease',
+            }} 
+          />
+        </div>
       </Html>
     </group>
   );
@@ -134,23 +148,24 @@ const SkillNeuralNetwork = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
+    <div className="relative w-full h-[700px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 6, 12]} fov={55} />
+        <PerspectiveCamera makeDefault position={[0, 4, 10]} fov={60} />
         <OrbitControls 
           enableZoom={true}
           autoRotate={false}
-          minDistance={8}
-          maxDistance={20}
+          minDistance={6}
+          maxDistance={18}
           enablePan={false}
           maxPolarAngle={Math.PI / 1.6}
           minPolarAngle={Math.PI / 4}
         />
         
-        <ambientLight intensity={0.6} />
-        <pointLight position={[10, 10, 10]} intensity={2.5} color="#00ffc8" />
-        <pointLight position={[-10, -10, -10]} intensity={2} color="#ff6b6b" />
-        <pointLight position={[0, 0, 10]} intensity={2} color="#4ECDC4" />
+        <ambientLight intensity={1} />
+        <pointLight position={[10, 10, 10]} intensity={3} color="#00ffc8" />
+        <pointLight position={[-10, -10, -10]} intensity={2.5} color="#ff6b6b" />
+        <pointLight position={[0, 0, 10]} intensity={2.5} color="#4ECDC4" />
+        <directionalLight position={[0, 10, 5]} intensity={2} color="#ffffff" />
         
         {orbits.map((orbit, i) => (
           <TechOrbit
@@ -165,13 +180,13 @@ const SkillNeuralNetwork = () => {
         
         {/* Central core */}
         <mesh>
-          <sphereGeometry args={[1, 32, 32]} />
+          <sphereGeometry args={[1.2, 32, 32]} />
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
-            emissiveIntensity={1}
+            emissiveIntensity={1.2}
             transparent
-            opacity={0.4}
+            opacity={0.5}
           />
         </mesh>
       </Canvas>
