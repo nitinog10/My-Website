@@ -86,91 +86,36 @@ const TechCard = ({ tech, index }: any) => {
       }}
     >
       <motion.div
-        className="relative bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden cursor-pointer"
+        className="relative bg-black/20 backdrop-blur-sm border border-white/5 rounded-xl p-8 overflow-hidden cursor-pointer group"
         style={{
-          boxShadow: hovered 
-            ? `0 0 40px ${tech.color}40, 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)` 
-            : '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+          background: hovered 
+            ? `linear-gradient(135deg, ${tech.color}08, transparent)` 
+            : 'rgba(0,0,0,0.2)',
         }}
         whileHover={{ 
-          scale: 1.08,
-          rotateZ: 2,
-          borderColor: tech.color + '60',
+          scale: 1.05,
+          y: -5,
+          borderColor: tech.color + '40',
           transition: {
             type: "spring",
-            stiffness: 300,
-            damping: 20
+            stiffness: 400,
+            damping: 25
           }
         }}
         whileTap={{ 
-          scale: 0.95,
+          scale: 0.98,
           transition: { duration: 0.1 }
         }}
       >
-        {/* Animated gradient overlay */}
+        {/* Simple glow on hover */}
         <motion.div
           className="absolute inset-0 opacity-0"
           style={{
-            background: `radial-gradient(circle at 50% 50%, ${tech.color}20, transparent 70%)`,
+            background: `radial-gradient(circle at 50% 0%, ${tech.color}15, transparent 60%)`,
           }}
-          animate={hovered ? {
-            opacity: 1,
-            scale: [1, 1.2, 1],
-            transition: {
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }
-          } : {
-            opacity: 0
-          }}
+          animate={hovered ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.3 }}
         />
-        
-        {/* Top shine effect */}
-        <motion.div
-          className="absolute top-0 left-0 right-0 h-px"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${tech.color}80, transparent)`,
-          }}
-          initial={{ x: '-100%', opacity: 0 }}
-          animate={hovered ? {
-            x: '100%',
-            opacity: [0, 1, 0],
-            transition: {
-              duration: 1,
-              ease: "easeInOut"
-            }
-          } : {
-            x: '-100%',
-            opacity: 0
-          }}
-        />
-
-        {/* Corner accents */}
-        <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-white/20 rounded-tl" />
-        <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-white/20 rounded-tr" />
-        <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-white/20 rounded-bl" />
-        <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-white/20 rounded-br" />
-        
-        {/* Animated corner glow */}
-        {hovered && (
-          <>
-            <motion.div
-              className="absolute top-0 left-0 w-8 h-8 rounded-full blur-xl"
-              style={{ backgroundColor: tech.color }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 0.4, scale: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-            <motion.div
-              className="absolute bottom-0 right-0 w-8 h-8 rounded-full blur-xl"
-              style={{ backgroundColor: tech.color }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 0.4, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.1 }}
-            />
-          </>
-        )}
 
         {/* Icon */}
         <motion.div
