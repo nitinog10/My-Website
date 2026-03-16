@@ -307,11 +307,125 @@ const Scene = ({ onTechHover, onTechClick }: any) => {
   );
 };
 
+const TechDetailModal = ({ tech, onClose }: any) => {
+  if (!tech) return null;
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-xl" />
+      
+      {/* Modal */}
+      <motion.div
+        className="relative max-w-2xl w-full bg-gradient-to-br from-black/90 to-gray-900/90 rounded-3xl border p-8 backdrop-blur-md"
+        style={{ borderColor: `${tech.color}40` }}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        >
+          <X className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Header */}
+        <div className="mb-6">
+          <div 
+            className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+            style={{ 
+              backgroundColor: `${tech.color}20`,
+              border: `2px solid ${tech.color}`,
+              boxShadow: `0 0 30px ${tech.color}40`
+            }}
+          >
+            <div 
+              className="w-8 h-8 rounded-full"
+              style={{ backgroundColor: tech.color }}
+            />
+          </div>
+          
+          <h3 className="text-4xl font-black uppercase tracking-tight text-white mb-2">
+            {tech.name}
+          </h3>
+          <p className="text-sm font-bold uppercase tracking-wider" style={{ color: tech.color }}>
+            {tech.category}
+          </p>
+        </div>
+
+        {/* Description */}
+        <div className="space-y-6">
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">
+              Description
+            </h4>
+            <p className="text-white/80 leading-relaxed">
+              {tech.description}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">
+              Used In
+            </h4>
+            <p className="text-white/80 leading-relaxed">
+              {tech.usedIn}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-white/50 mb-3">
+              Associated Projects
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {tech.projects.map((project: string) => (
+                <span
+                  key={project}
+                  className="px-3 py-2 rounded-lg text-sm font-semibold text-white"
+                  style={{ 
+                    backgroundColor: `${tech.color}20`,
+                    border: `1px solid ${tech.color}40`
+                  }}
+                >
+                  {project}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const TechEcosystem = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: false, margin: '-20%' });
   const [hoveredTech, setHoveredTech] = useState<any>(null);
+  const [selectedTech, setSelectedTech] = useState<any>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: -(e.clientY / window.innerHeight) * 2 + 1,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   useEffect(() => {
     if (!canvasRef.current) return;
