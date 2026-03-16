@@ -60,7 +60,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
         />
       </mesh>
       
-      {/* Icon - much larger and clearer */}
+      {/* Icon - clean without border */}
       <Html
         center
         distanceFactor={1.2}
@@ -70,28 +70,16 @@ const TechNode = ({ tech, position, onHover }: any) => {
           pointerEvents: 'none',
         }}
       >
-        <div style={{
-          background: hovered ? 'rgba(0,0,0,0.8)' : 'rgba(0,0,0,0.5)',
-          borderRadius: '50%',
-          padding: '12px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backdropFilter: 'blur(10px)',
-          border: `2px solid ${hovered ? tech.color : 'rgba(255,255,255,0.2)'}`,
-          transition: 'all 0.3s ease',
-        }}>
-          <IconComponent 
-            style={{ 
-              color: hovered ? tech.color : '#ffffff', 
-              fontSize: hovered ? '80px' : '72px',
-              filter: hovered 
-                ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
-                : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
-              transition: 'all 0.3s ease',
-            }} 
-          />
-        </div>
+        <IconComponent 
+          style={{ 
+            color: hovered ? tech.color : '#ffffff', 
+            fontSize: hovered ? '80px' : '72px',
+            filter: hovered 
+              ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
+              : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
+            transition: 'all 0.3s ease',
+          }} 
+        />
       </Html>
     </group>
   );
