@@ -44,7 +44,7 @@ const experiences = [
   {
     role: "B.TECH (AIML)",
     company: "ORIENTAL GROUP",
-    period: "2024 — PRESENT",
+    period: "2024 — 2028",
     description: "Specializing in the intersection of Artificial Intelligence and Machine Learning architecture.",
     tags: ["AIML", "Engineering", "Core"]
   }
