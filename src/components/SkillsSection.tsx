@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Brain, Code, Layers, Database, Cloud, Sparkles, Zap, Cpu } from 'lucide-react';
@@ -9,14 +9,15 @@ gsap.registerPlugin(ScrollTrigger);
 const skillCategories = [
   {
     id: 'ai',
-    title: 'AI & Machine Learning',
+    title: 'AI & ML',
+    subtitle: 'Artificial Intelligence',
     icon: Brain,
     color: '#FF6B6B',
-    gradient: 'from-red-500 to-pink-500',
+    bgImage: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     skills: [
-      'Generative AI (LLMs, RAG)',
-      'Computer Vision & Object Detection',
-      'NLP & Model Fine-Tuning',
+      'Generative AI & LLMs',
+      'Computer Vision',
+      'NLP & Fine-Tuning',
       'Multi-Agent Systems',
       'PyTorch & TensorFlow',
       'Transformers & Keras'
@@ -24,40 +25,43 @@ const skillCategories = [
   },
   {
     id: 'fullstack',
-    title: 'Full-Stack Development',
+    title: 'Full-Stack',
+    subtitle: 'Web Development',
     icon: Code,
     color: '#4ECDC4',
-    gradient: 'from-cyan-500 to-teal-500',
+    bgImage: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
     skills: [
       'React & Next.js',
       'Node.js & FastAPI',
-      'TypeScript & JavaScript',
+      'TypeScript',
       'Tailwind CSS',
       'GSAP Animations',
-      'Three.js & 3D Web'
+      'Three.js & WebGL'
     ]
   },
   {
     id: 'architecture',
-    title: 'System Architecture',
+    title: 'Architecture',
+    subtitle: 'System Design',
     icon: Layers,
     color: '#45B7D1',
-    gradient: 'from-blue-500 to-indigo-500',
+    bgImage: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
     skills: [
-      'Scalable AI Systems',
-      'Microservices Design',
-      'RESTful & GraphQL APIs',
+      'Scalable Systems',
+      'Microservices',
+      'API Design',
       'MCP Servers',
-      'Cloud-Native Apps',
+      'Cloud-Native',
       'CI/CD Pipelines'
     ]
   },
   {
     id: 'data',
-    title: 'Data Engineering',
+    title: 'Data Eng',
+    subtitle: 'Data Engineering',
     icon: Database,
     color: '#95E1D3',
-    gradient: 'from-emerald-500 to-green-500',
+    bgImage: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
     skills: [
       'Pandas & NumPy',
       'Data Pipelines',
@@ -70,248 +74,222 @@ const skillCategories = [
   {
     id: 'cloud',
     title: 'Cloud & DevOps',
+    subtitle: 'Infrastructure',
     icon: Cloud,
     color: '#FFA502',
-    gradient: 'from-orange-500 to-amber-500',
+    bgImage: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
     skills: [
-      'AWS & Google Cloud',
+      'AWS & GCP',
       'Docker & Kubernetes',
-      'Serverless Architecture',
+      'Serverless',
       'Infrastructure as Code',
-      'Monitoring & Logging',
+      'Monitoring',
       'Git & Version Control'
     ]
   }
 ];
 
-const SkillCard = ({ category, index, isInView }: any) => {
-  const cardRef = useRef<HTMLDivElement>(null);
+const SkillCard = ({ category, index }: any) => {
   const [isHovered, setIsHovered] = useState(false);
   const IconComponent = category.icon;
 
-  // Diagonal pattern: 0,1,2,3,4 -> top-left, bottom-right, top-right, bottom-left, center
-  const getEntryDirection = (idx: number) => {
-    const patterns = [
-      { x: -100, y: -100 }, // top-left
-      { x: 100, y: 100 },   // bottom-right
-      { x: 100, y: -100 },  // top-right
-      { x: -100, y: 100 },  // bottom-left
-      { x: 0, y: -100 },    // top-center
-    ];
-    return patterns[idx % patterns.length];
-  };
-
-  const direction = getEntryDirection(index);
-
-  useEffect(() => {
-    if (!cardRef.current) return;
-
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        cardRef.current,
-        { 
-          opacity: 0, 
-          x: direction.x,
-          y: direction.y,
-          scale: 0.8,
-          rotateZ: direction.x > 0 ? 15 : -15,
-        },
-        {
-          opacity: 1,
-          x: 0,
-          y: 0,
-          scale: 1,
-          rotateZ: 0,
-          duration: 1,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: 'top 85%',
-            end: 'top 20%',
-            toggleActions: 'play none none reverse',
-            scrub: 1,
-          },
-        }
-      );
-    });
-
-    return () => ctx.revert();
-  }, [index, direction.x, direction.y]);
-
   return (
     <motion.div
-      ref={cardRef}
-      className="group relative"
+      className="flex-shrink-0 w-[400px] h-[500px] relative group cursor-pointer"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ scale: 1.05, y: -10 }}
       transition={{ duration: 0.3 }}
     >
-      <div
-        className="relative p-8 rounded-3xl overflow-hidden transition-all duration-500"
-        style={{
-          background: isHovered 
-            ? `linear-gradient(135deg, ${category.color}15, rgba(0,0,0,0.8))`
-            : 'rgba(17, 17, 20, 0.6)',
-          border: isHovered 
-            ? `2px solid ${category.color}60`
-            : '1px solid rgba(255,255,255,0.08)',
-          boxShadow: isHovered 
-            ? `0 20px 60px ${category.color}30, 0 0 80px ${category.color}20`
-            : '0 4px 20px rgba(0,0,0,0.3)',
-        }}
-      >
-        {/* Top gradient line */}
+      {/* Card */}
+      <div className="relative w-full h-full rounded-3xl overflow-hidden">
+        {/* Background gradient */}
         <div 
-          className="absolute top-0 left-0 right-0 h-1"
+          className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity duration-500"
+          style={{ background: category.bgImage }}
+        />
+        
+        {/* Glass effect */}
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+        {/* Border glow */}
+        <div 
+          className="absolute inset-0 rounded-3xl"
           style={{
-            background: `linear-gradient(90deg, transparent, ${category.color}, transparent)`,
-            opacity: isHovered ? 1 : 0.3,
-            transition: 'opacity 0.3s',
+            border: `2px solid ${isHovered ? category.color + '80' : category.color + '30'}`,
+            boxShadow: isHovered ? `0 0 40px ${category.color}40, inset 0 0 40px ${category.color}10` : 'none',
+            transition: 'all 0.3s',
           }}
         />
 
-        {/* Icon and Title */}
-        <div className="flex items-start gap-6 mb-6">
+        {/* Content */}
+        <div className="relative h-full p-8 flex flex-col">
+          {/* Icon */}
           <motion.div
-            className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
             style={{
-              background: `linear-gradient(135deg, ${category.color}30, ${category.color}10)`,
+              background: `${category.color}20`,
               border: `1px solid ${category.color}40`,
             }}
-            animate={isHovered ? { rotate: 360 } : { rotate: 0 }}
-            transition={{ duration: 0.6 }}
+            animate={isHovered ? { rotate: [0, 360] } : { rotate: 0 }}
+            transition={{ duration: 0.8 }}
           >
             <IconComponent 
-              className="w-8 h-8"
+              className="w-10 h-10"
               style={{ 
                 color: category.color,
-                filter: `drop-shadow(0 0 8px ${category.color}60)`,
+                filter: `drop-shadow(0 0 10px ${category.color})`,
               }}
             />
           </motion.div>
 
-          <div className="flex-1">
+          {/* Title */}
+          <div className="mb-6">
             <h3 
-              className="text-2xl font-black uppercase tracking-tight mb-2"
-              style={{ color: isHovered ? category.color : '#fff' }}
+              className="text-4xl font-black uppercase tracking-tight mb-2"
+              style={{ color: category.color }}
             >
               {category.title}
             </h3>
-            <div className="flex items-center gap-2">
-              <div 
-                className="h-px flex-1"
-                style={{ 
-                  background: `linear-gradient(90deg, ${category.color}60, transparent)`,
+            <p className="text-white/50 text-sm uppercase tracking-wider">
+              {category.subtitle}
+            </p>
+          </div>
+
+          {/* Skills */}
+          <div className="flex-1 space-y-3">
+            {category.skills.map((skill: string, i: number) => (
+              <motion.div
+                key={skill}
+                className="flex items-center gap-3 p-3 rounded-xl backdrop-blur-sm"
+                style={{
+                  background: isHovered ? `${category.color}10` : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${isHovered ? category.color + '30' : 'rgba(255,255,255,0.05)'}`,
                 }}
-              />
-              <span className="text-xs text-white/40 uppercase tracking-wider">
-                {category.skills.length} Skills
-              </span>
-            </div>
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.05 }}
+              >
+                <motion.div
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: category.color }}
+                  animate={isHovered ? { scale: [1, 1.5, 1] } : {}}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+                <span className="text-sm text-white/80">{skill}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Number */}
+          <div 
+            className="absolute bottom-8 right-8 text-8xl font-black opacity-10"
+            style={{ color: category.color }}
+          >
+            0{index + 1}
           </div>
         </div>
-
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {category.skills.map((skill: string, i: number) => (
-            <motion.div
-              key={skill}
-              className="flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
-              style={{
-                background: isHovered ? `${category.color}08` : 'transparent',
-                border: `1px solid ${isHovered ? category.color + '20' : 'transparent'}`,
-              }}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: false, margin: '-50px' }}
-              transition={{ delay: i * 0.05, duration: 0.4 }}
-            >
-              <motion.div
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: category.color }}
-                animate={isHovered ? { scale: [1, 1.5, 1] } : { scale: 1 }}
-                transition={{ duration: 1, repeat: isHovered ? Infinity : 0 }}
-              />
-              <span className="text-sm text-white/70 group-hover:text-white/90 transition-colors">
-                {skill}
-              </span>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Hover glow effect */}
-        <motion.div
-          className="absolute inset-0 rounded-3xl pointer-events-none"
-          style={{
-            background: `radial-gradient(circle at 50% 0%, ${category.color}20, transparent 70%)`,
-            opacity: isHovered ? 1 : 0,
-          }}
-          transition={{ duration: 0.3 }}
-        />
-
-        {/* Corner accent */}
-        <div 
-          className="absolute bottom-4 right-4 w-12 h-12 rounded-full opacity-20"
-          style={{
-            background: `radial-gradient(circle, ${category.color}, transparent)`,
-            filter: 'blur(20px)',
-          }}
-        />
       </div>
     </motion.div>
   );
 };
 
 const SkillsSection = () => {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: false, margin: '-20%' });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef });
+  
+  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-70%']);
+
+  useEffect(() => {
+    if (!scrollRef.current || !containerRef.current) return;
+
+    const ctx = gsap.context(() => {
+      const scrollWidth = scrollRef.current!.scrollWidth;
+      const windowWidth = window.innerWidth;
+
+      gsap.to(scrollRef.current, {
+        x: -(scrollWidth - windowWidth),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: () => `+=${scrollWidth}`,
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      });
+    });
+
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden bg-black">
-      {/* Background effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]" />
-      </div>
+    <section ref={containerRef} className="relative h-[200vh] bg-black">
+      <div className="sticky top-0 h-screen overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+        
+        {/* Animated grid */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'linear-gradient(rgba(0,255,200,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,200,0.1) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }} />
+        </div>
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        {/* Header */}
-        <motion.div
-          className="mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8 }}
-        >
-          <div className="flex items-center gap-4 mb-6">
-            <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold">
+        {/* Title - Fixed on left */}
+        <div className="absolute left-12 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block">
               002 — CAPABILITIES
             </span>
-            <div className="h-px flex-1 bg-gradient-to-r from-accent/30 to-transparent" />
+            <h2 className="text-[clamp(3rem, 8vw, 6rem)] font-black uppercase tracking-tighter leading-[0.85] text-white">
+              WHAT I<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
+                WORK WITH
+              </span>
+            </h2>
+            <div className="flex items-center gap-4 mt-8">
+              <div className="h-px w-16 bg-accent" />
+              <span className="text-sm text-white/60 uppercase tracking-wider">Scroll horizontally</span>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Horizontal scroll container */}
+        <div className="absolute inset-0 flex items-center">
+          <motion.div
+            ref={scrollRef}
+            className="flex gap-8 px-[50vw] py-20"
+            style={{ x }}
+          >
+            {skillCategories.map((category, index) => (
+              <SkillCard key={category.id} category={category} index={index} />
+            ))}
+            
+            {/* End spacer */}
+            <div className="w-[40vw] flex-shrink-0" />
+          </motion.div>
+        </div>
+
+        {/* Progress indicator */}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-white/50 uppercase tracking-wider">Progress</span>
+            <div className="w-32 h-1 bg-white/10 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-accent"
+                style={{ scaleX: scrollYProgress, transformOrigin: 'left' }}
+              />
+            </div>
           </div>
-          
-          <h2 className="text-[clamp(3rem, 10vw, 8rem)] font-black uppercase tracking-tighter leading-[0.85] text-white mb-6">
-            WHAT I<br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
-              WORK WITH
-            </span>
-          </h2>
-
-          <p className="text-white/60 text-lg max-w-2xl">
-            A comprehensive breakdown of my technical expertise across AI, development, and infrastructure.
-          </p>
-        </motion.div>
-
-        {/* Skills Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {skillCategories.map((category, index) => (
-            <SkillCard
-              key={category.id}
-              category={category}
-              index={index}
-              isInView={isInView}
-            />
-          ))}
         </div>
       </div>
     </section>
