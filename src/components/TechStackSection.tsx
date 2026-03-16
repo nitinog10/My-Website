@@ -174,6 +174,7 @@ const TechCard = ({ tech, index }: any) => {
             }}
           >
             <motion.div
+              className="rounded-full p-2 relative"
               animate={hovered ? {
                 boxShadow: [
                   `0 0 0px ${tech.color}00`,
@@ -188,10 +189,27 @@ const TechCard = ({ tech, index }: any) => {
                   ease: "easeInOut"
                 }
               } : {}}
-              className="rounded-full p-2"
             >
+              {/* Border glow on hover */}
+              {hovered && (
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 pointer-events-none"
+                  style={{ borderColor: tech.color }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{
+                    opacity: [0, 1, 0],
+                    scale: [0.9, 1.1, 1.3],
+                  }}
+                  transition={{
+                    duration: 1,
+                    repeat: Infinity,
+                    ease: "easeOut"
+                  }}
+                />
+              )}
+              
               <IconComponent
-                className="w-12 h-12 md:w-14 md:h-14"
+                className="w-12 h-12 md:w-14 md:h-14 relative z-10"
                 style={{
                   color: hovered ? tech.color : '#888888',
                   filter: hovered 
