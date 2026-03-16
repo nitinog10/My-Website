@@ -50,20 +50,20 @@ const TechNode = ({ tech, position, onHover }: any) => {
     >
       {/* Glowing sphere */}
       <mesh>
-        <sphereGeometry args={[0.35, 32, 32]} />
+        <sphereGeometry args={[0.5, 32, 32]} />
         <meshStandardMaterial
           color={tech.color}
           emissive={tech.color}
-          emissiveIntensity={hovered ? 1.8 : 0.6}
+          emissiveIntensity={hovered ? 2 : 0.8}
           transparent
-          opacity={hovered ? 0.9 : 0.5}
+          opacity={hovered ? 0.95 : 0.6}
         />
       </mesh>
       
       {/* Icon */}
       <Html
         center
-        distanceFactor={3}
+        distanceFactor={2}
         position={[0, 0, 0]}
         style={{
           transition: 'all 0.3s ease',
@@ -73,8 +73,8 @@ const TechNode = ({ tech, position, onHover }: any) => {
         <IconComponent 
           style={{ 
             color: '#ffffff', 
-            fontSize: hovered ? '44px' : '32px',
-            filter: hovered ? `drop-shadow(0 0 20px ${tech.color})` : 'none',
+            fontSize: hovered ? '64px' : '56px',
+            filter: hovered ? `drop-shadow(0 0 24px ${tech.color})` : `drop-shadow(0 0 8px rgba(255,255,255,0.5))`,
             transition: 'all 0.3s ease',
           }} 
         />
@@ -136,21 +136,21 @@ const SkillNeuralNetwork = () => {
   return (
     <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 8, 14]} fov={50} />
+        <PerspectiveCamera makeDefault position={[0, 6, 12]} fov={55} />
         <OrbitControls 
           enableZoom={true}
           autoRotate={false}
-          minDistance={10}
-          maxDistance={25}
+          minDistance={8}
+          maxDistance={20}
           enablePan={false}
           maxPolarAngle={Math.PI / 1.6}
           minPolarAngle={Math.PI / 4}
         />
         
-        <ambientLight intensity={0.4} />
-        <pointLight position={[10, 10, 10]} intensity={2} color="#00ffc8" />
-        <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff6b6b" />
-        <pointLight position={[0, 0, 10]} intensity={1.5} color="#4ECDC4" />
+        <ambientLight intensity={0.6} />
+        <pointLight position={[10, 10, 10]} intensity={2.5} color="#00ffc8" />
+        <pointLight position={[-10, -10, -10]} intensity={2} color="#ff6b6b" />
+        <pointLight position={[0, 0, 10]} intensity={2} color="#4ECDC4" />
         
         {orbits.map((orbit, i) => (
           <TechOrbit
@@ -165,13 +165,13 @@ const SkillNeuralNetwork = () => {
         
         {/* Central core */}
         <mesh>
-          <sphereGeometry args={[0.8, 32, 32]} />
+          <sphereGeometry args={[1, 32, 32]} />
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
-            emissiveIntensity={0.8}
+            emissiveIntensity={1}
             transparent
-            opacity={0.3}
+            opacity={0.4}
           />
         </mesh>
       </Canvas>
