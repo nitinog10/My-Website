@@ -7,9 +7,10 @@ import {
   SiPython, SiTypescript, SiJavascript, SiReact, SiNextdotjs,
   SiNodedotjs, SiTailwindcss, SiOpenai, SiTensorflow, SiPytorch,
   SiDocker, SiKubernetes, SiMongodb, SiPostgresql,
-  SiGit, SiFigma, SiVercel, SiGooglecloud,
+  SiGit, SiFigma, SiVercel, SiGooglecloud, SiKeras, SiPandas, SiGreensock,
 } from "react-icons/si";
 import { FaAws } from "react-icons/fa6";
+import { TbTransform } from "react-icons/tb";
 
 const technologies = [
   { icon: SiPython, name: "Python", color: "#3776AB", category: "Language" },
@@ -22,6 +23,9 @@ const technologies = [
   { icon: SiOpenai, name: "OpenAI", color: "#412991", category: "AI" },
   { icon: SiTensorflow, name: "TensorFlow", color: "#FF6F00", category: "AI" },
   { icon: SiPytorch, name: "PyTorch", color: "#EE4C2C", category: "AI" },
+  { icon: SiKeras, name: "Keras", color: "#D00000", category: "AI" },
+  { icon: TbTransform, name: "Transformers", color: "#FFD21E", category: "AI" },
+  { icon: SiPandas, name: "Pandas", color: "#150458", category: "Data Science" },
   { icon: SiDocker, name: "Docker", color: "#2496ED", category: "DevOps" },
   { icon: SiKubernetes, name: "Kubernetes", color: "#326CE5", category: "DevOps" },
   { icon: FaAws, name: "AWS", color: "#FF9900", category: "Cloud" },
@@ -31,6 +35,7 @@ const technologies = [
   { icon: SiGit, name: "Git", color: "#F05032", category: "Tools" },
   { icon: SiFigma, name: "Figma", color: "#F24E1E", category: "Design" },
   { icon: SiVercel, name: "Vercel", color: "#FFFFFF", category: "Cloud" },
+  { icon: SiGreensock, name: "GSAP", color: "#88CE02", category: "Animation" },
 ];
 
 const TechNode = ({ tech, position, index, onHover }: any) => {
@@ -40,44 +45,68 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    groupRef.current.position.y = position[1] + Math.sin(time + index) * 0.2;
-    groupRef.current.rotation.x = Math.sin(time / 2) * 0.1;
-    groupRef.current.rotation.y = Math.cos(time / 2) * 0.1;
+    // Smooth floating animation
+    groupRef.current.position.y = position[1] + Math.sin(time * 0.5 + index) * 0.3;
+    // Gentle rotation
+    groupRef.current.rotation.y += 0.005;
   });
 
   return (
-    <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+    <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
       <group
         ref={groupRef}
         position={position}
         onPointerOver={() => { setHovered(true); onHover(tech); }}
         onPointerOut={() => { setHovered(false); onHover(null); }}
       >
+        {/* Outer glow sphere */}
         <mesh>
-          <sphereGeometry args={[0.5, 32, 32]} />
-          <MeshDistortMaterial
-            color={hovered ? tech.color : "#1a1a1a"}
-            speed={2}
-            distort={0.3}
-            radius={1}
-            emissive={hovered ? tech.color : "#000"}
-            emissiveIntensity={hovered ? 1.5 : 0.2}
+          <sphereGeometry args={[0.7, 32, 32]} />
+          <meshBasicMaterial
+            color={tech.color}
             transparent
-            opacity={0.4}
+            opacity={hovered ? 0.15 : 0.05}
+            side={THREE.BackSide}
           />
         </mesh>
+        
+        {/* Main sphere */}
+        <mesh>
+          <sphereGeometry args={[0.55, 32, 32]} />
+          <MeshDistortMaterial
+            color={hovered ? tech.color : "#0a0a0a"}
+            speed={1.5}
+            distort={0.2}
+            radius={1}
+            emissive={tech.color}
+            emissiveIntensity={hovered ? 0.8 : 0.1}
+            transparent
+            opacity={hovered ? 0.6 : 0.3}
+            metalness={0.8}
+            roughness={0.2}
+          />
+        </mesh>
+        
+        {/* Icon */}
         <Html
           center
-          distanceFactor={8}
+          distanceFactor={6}
           position={[0, 0, 0]}
           style={{
-            transition: 'all 0.3s ease',
+            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
             pointerEvents: 'none',
+            userSelect: 'none',
           }}
         >
           <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            animate={{ 
+              rotate: 360,
+              scale: hovered ? 1.2 : 1,
+            }}
+            transition={{ 
+              rotate: { duration: 6, repeat: Infinity, ease: "linear" },
+              scale: { duration: 0.3 }
+            }}
             style={{ 
               display: 'flex', 
               alignItems: 'center', 
@@ -86,10 +115,12 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
           >
             <IconComponent 
               style={{ 
-                color: hovered ? tech.color : '#888', 
-                fontSize: hovered ? '40px' : '36px',
-                filter: hovered ? `drop-shadow(0 0 12px ${tech.color})` : 'none',
-                transition: 'all 0.3s ease',
+                color: hovered ? tech.color : '#ffffff', 
+                fontSize: '48px',
+                filter: hovered 
+                  ? `drop-shadow(0 0 20px ${tech.color}) drop-shadow(0 0 40px ${tech.color})` 
+                  : 'drop-shadow(0 0 8px rgba(255,255,255,0.3))',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
               }} 
             />
           </motion.div>
@@ -117,11 +148,19 @@ const SkillNeuralNetwork = () => {
   return (
     <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5 cursor-move">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 0, 12]} />
-        <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <spotLight position={[-10, 10, 10]} angle={0.15} />
+        <PerspectiveCamera makeDefault position={[0, 0, 15]} fov={45} />
+        <OrbitControls 
+          enableZoom={true} 
+          autoRotate 
+          autoRotateSpeed={0.3}
+          minDistance={10}
+          maxDistance={20}
+          enablePan={false}
+        />
+        <ambientLight intensity={0.3} />
+        <pointLight position={[10, 10, 10]} intensity={1.5} color="#00ffc8" />
+        <pointLight position={[-10, -10, -10]} intensity={0.8} color="#ff6b6b" />
+        <pointLight position={[0, 0, 10]} intensity={1} color="#4ECDC4" />
         
         {technologies.map((tech, i) => (
           <TechNode 
@@ -133,20 +172,35 @@ const SkillNeuralNetwork = () => {
           />
         ))}
 
-        {/* Dynamic connection lines to center */}
-        {techPositions.map((pos, i) => (
-          <line key={`line-${i}`}>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={2}
-                array={new Float32Array([...pos, 0, 0, 0])}
-                itemSize={3}
-              />
-            </bufferGeometry>
-            <lineBasicMaterial color="#ffffff" opacity={0.03} transparent />
-          </line>
-        ))}
+        {/* Connection lines with gradient */}
+        {techPositions.map((pos, i) => {
+          if (i >= techPositions.length - 1) return null;
+          return (
+            <line key={`line-${i}`}>
+              <bufferGeometry>
+                <bufferAttribute
+                  attach="attributes-position"
+                  count={2}
+                  array={new Float32Array([...pos, 0, 0, 0])}
+                  itemSize={3}
+                />
+              </bufferGeometry>
+              <lineBasicMaterial color="#00ffc8" opacity={0.08} transparent />
+            </line>
+          );
+        })}
+        
+        {/* Central core */}
+        <Sphere args={[0.8, 32, 32]} position={[0, 0, 0]}>
+          <meshStandardMaterial
+            color="#00ffc8"
+            emissive="#00ffc8"
+            emissiveIntensity={0.3}
+            transparent
+            opacity={0.1}
+            wireframe
+          />
+        </Sphere>
       </Canvas>
 
       {/* Info Overlay */}
@@ -186,8 +240,8 @@ const SkillNeuralNetwork = () => {
       </div>
 
       <div className="absolute top-8 right-8 text-right pointer-events-none">
-        <p className="text-[10px] text-white/30 uppercase tracking-[0.4em] mb-1">TECH ECOSYSTEM V1.0</p>
-        <p className="text-xs text-white/60 uppercase tracking-[0.1em]">Hold to Rotate • Scroll to Zoom</p>
+        <p className="text-[10px] text-white/30 uppercase tracking-[0.4em] mb-1">TECH ECOSYSTEM V2.0</p>
+        <p className="text-xs text-white/60 uppercase tracking-[0.1em]">Drag to Rotate • Scroll to Zoom</p>
       </div>
     </div>
   );
