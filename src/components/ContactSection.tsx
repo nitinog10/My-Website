@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import { SiGithub, SiInstagram, SiX } from 'react-icons/si';
-import { FaLinkedinIn } from 'react-icons/fa6';
+import { SiGithub, SiLinkedin, SiInstagram, SiX } from 'react-icons/si';
 import { MdEmail } from 'react-icons/md';
 
 const socials = [
   {
-    icon: FaLinkedinIn,
+    icon: SiLinkedin,
     label: 'LinkedIn',
     handle: 'nitin-kumar-mishra',
     href: 'https://www.linkedin.com/in/nitin-kumar-mishra-520615331',

@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { FaAws } from "react-icons/fa6";
 import {
   SiPython,
   SiTypescript,
@@ -14,6 +13,7 @@ import {
   SiPytorch,
   SiDocker,
   SiKubernetes,
+  SiAmazonwebservices,
   SiMongodb,
   SiPostgresql,
   SiRedis,
@@ -36,7 +36,7 @@ const technologies = [
   { icon: SiPytorch, name: "PyTorch" },
   { icon: SiDocker, name: "Docker" },
   { icon: SiKubernetes, name: "Kubernetes" },
-  { icon: FaAws, name: "AWS" },
+  { icon: SiAmazonwebservices, name: "AWS" },
   { icon: SiGooglecloud, name: "GCP" },
   { icon: SiMongodb, name: "MongoDB" },
   { icon: SiPostgresql, name: "PostgreSQL" },
