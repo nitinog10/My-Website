@@ -54,38 +54,42 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
         onPointerOut={() => { setHovered(false); onHover(null); }}
       >
         <mesh>
-          <sphereGeometry args={[0.4, 32, 32]} />
+          <sphereGeometry args={[0.5, 32, 32]} />
           <MeshDistortMaterial
-            color={hovered ? tech.color : "#333"}
-            speed={3}
-            distort={0.4}
+            color={hovered ? tech.color : "#1a1a1a"}
+            speed={2}
+            distort={0.3}
             radius={1}
             emissive={hovered ? tech.color : "#000"}
-            emissiveIntensity={hovered ? 2 : 0}
+            emissiveIntensity={hovered ? 1.5 : 0.2}
             transparent
-            opacity={0.3}
+            opacity={0.4}
           />
         </mesh>
         <Html
           center
-          distanceFactor={10}
+          distanceFactor={8}
           position={[0, 0, 0]}
           style={{
-            transition: 'all 0.3s',
-            opacity: 1,
-            transform: hovered ? 'scale(1.2)' : 'scale(1)',
+            transition: 'all 0.3s ease',
+            pointerEvents: 'none',
           }}
         >
           <motion.div
             animate={{ rotate: 360 }}
-            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+            }}
           >
             <IconComponent 
               style={{ 
-                color: tech.color, 
-                fontSize: '32px',
-                filter: `drop-shadow(0 0 8px ${tech.color})`,
+                color: hovered ? tech.color : '#888', 
+                fontSize: hovered ? '40px' : '36px',
+                filter: hovered ? `drop-shadow(0 0 12px ${tech.color})` : 'none',
+                transition: 'all 0.3s ease',
               }} 
             />
           </motion.div>
@@ -235,39 +239,6 @@ const TechStackSection = () => {
         >
           <SkillNeuralNetwork />
         </motion.div>
-
-        <div className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {technologies.map((tech, i) => (
-                <motion.div 
-                    key={tech.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ delay: 0.6 + (i * 0.05) }}
-                    className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
-                    whileHover={{ y: -4, scale: 1.02 }}
-                >
-                    {/* Rotating icon on hover */}
-                    <motion.div
-                      className="flex items-center justify-center mb-4"
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.6, ease: "easeInOut" }}
-                    >
-                      <tech.icon className="w-10 h-10 md:w-12 md:h-12" style={{ color: tech.color }} />
-                    </motion.div>
-                    
-                    <h4 className="text-sm font-bold text-white text-center mb-1">{tech.name}</h4>
-                    <p className="text-xs text-white/40 text-center uppercase tracking-wider">{tech.category}</p>
-                    
-                    {/* Hover glow effect */}
-                    <motion.div
-                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                      style={{
-                        background: `radial-gradient(circle at center, ${tech.color}15, transparent)`,
-                      }}
-                    />
-                </motion.div>
-            ))}
-        </div>
       </div>
     </section>
   );
