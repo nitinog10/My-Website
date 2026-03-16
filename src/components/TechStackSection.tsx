@@ -1,8 +1,5 @@
-import { useRef, useState, useMemo } from "react";
+import { useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
 import {
   SiPython, SiTypescript, SiJavascript, SiReact, SiNextdotjs,
   SiNodedotjs, SiTailwindcss, SiOpenai, SiTensorflow, SiPytorch,
@@ -20,7 +17,7 @@ const technologies = [
   { icon: SiNextdotjs, name: "Next.js", color: "#FFFFFF", category: "Frontend" },
   { icon: SiNodedotjs, name: "Node.js", color: "#339933", category: "Backend" },
   { icon: SiTailwindcss, name: "Tailwind", color: "#06B6D4", category: "Frontend" },
-  { icon: SiOpenai, name: "OpenAI", color: "#412991", category: "AI" },
+  { icon: SiGit, name: "Git", color: "#F05032", category: "Tools" },
   { icon: SiTensorflow, name: "TensorFlow", color: "#FF6F00", category: "AI" },
   { icon: SiPytorch, name: "PyTorch", color: "#EE4C2C", category: "AI" },
   { icon: SiKeras, name: "Keras", color: "#D00000", category: "AI" },
@@ -32,164 +29,293 @@ const technologies = [
   { icon: SiGooglecloud, name: "GCP", color: "#4285F4", category: "Cloud" },
   { icon: SiMongodb, name: "MongoDB", color: "#47A248", category: "Database" },
   { icon: SiPostgresql, name: "PostgreSQL", color: "#4169E1", category: "Database" },
-  { icon: SiGit, name: "Git", color: "#F05032", category: "Tools" },
+  { icon: SiOpenai, name: "OpenAI", color: "#412991", category: "AI" },
   { icon: SiFigma, name: "Figma", color: "#F24E1E", category: "Design" },
   { icon: SiVercel, name: "Vercel", color: "#FFFFFF", category: "Cloud" },
   { icon: SiGreensock, name: "GSAP", color: "#88CE02", category: "Animation" },
 ];
 
-const TechNode = ({ tech, position, onHover }: any) => {
+const TechCard = ({ tech, index }: any) => {
   const [hovered, setHovered] = useState(false);
   const IconComponent = tech.icon;
+  const cardRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(cardRef, { once: false, margin: "-100px" });
 
   return (
-    <group
-      position={position}
-      onPointerOver={() => { setHovered(true); onHover(tech); }}
-      onPointerOut={() => { setHovered(false); onHover(null); }}
+    <motion.div
+      ref={cardRef}
+      initial={{ 
+        opacity: 0, 
+        scale: 0.5, 
+        rotateY: -180,
+        z: -200 
+      }}
+      animate={isInView ? { 
+        opacity: 1, 
+        scale: 1, 
+        rotateY: 0,
+        z: 0,
+        transition: {
+          duration: 0.8,
+          delay: index * 0.08,
+          ease: [0.25, 0.46, 0.45, 0.94],
+          opacity: { duration: 0.6 },
+          scale: { 
+            type: "spring",
+            stiffness: 100,
+            damping: 15
+          }
+        }
+      } : { 
+        opacity: 0, 
+        scale: 0.5, 
+        rotateY: -180,
+        z: -200,
+        transition: {
+          duration: 0.5,
+          ease: [0.25, 0.46, 0.45, 0.94]
+        }
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="group relative"
+      style={{ 
+        transformStyle: 'preserve-3d', 
+        perspective: 1000,
+        transformOrigin: 'center center'
+      }}
     >
-      {/* Icon only - no sphere */}
-      <Html
-        center
-        distanceFactor={100}
-        position={[0, 0, 0]}
+      <motion.div
+        className="relative bg-gradient-to-br from-black/60 via-black/40 to-black/60 backdrop-blur-md border border-white/10 rounded-2xl p-6 overflow-hidden cursor-pointer"
         style={{
-          transition: 'all 0.3s ease',
-          pointerEvents: 'none',
+          boxShadow: hovered 
+            ? `0 0 40px ${tech.color}40, 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)` 
+            : '0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)',
+        }}
+        whileHover={{ 
+          scale: 1.08,
+          rotateZ: 2,
+          borderColor: tech.color + '60',
+          transition: {
+            type: "spring",
+            stiffness: 300,
+            damping: 20
+          }
+        }}
+        whileTap={{ 
+          scale: 0.95,
+          transition: { duration: 0.1 }
         }}
       >
-        <IconComponent 
-          style={{ 
-            color: hovered ? tech.color : '#ffffff', 
-            fontSize: hovered ? '3.5px' : '3px',
-            filter: hovered 
-              ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
-              : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
-            transition: 'all 0.3s ease',
-          }} 
-        />
-      </Html>
-    </group>
-  );
-};
-
-const TechOrbit = ({ techs, radius, speed, tilt, onHover }: any) => {
-  const groupRef = useRef<THREE.Group>(null!);
-
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    groupRef.current.rotation.y = state.clock.getElapsedTime() * speed;
-  });
-
-  return (
-    <group ref={groupRef} rotation={[tilt, 0, 0]}>
-      {/* Orbit ring - simplified */}
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[radius, 0.01, 8, 50]} />
-        <meshBasicMaterial color="#00ffc8" transparent opacity={0.15} />
-      </mesh>
-
-      {techs.map((tech: any, i: number) => {
-        const angle = (i / techs.length) * Math.PI * 2;
-        const x = Math.cos(angle) * radius;
-        const z = Math.sin(angle) * radius;
-        
-        return (
-          <TechNode
-            key={tech.name}
-            tech={tech}
-            position={[x, 0, z]}
-            onHover={onHover}
-          />
-        );
-      })}
-    </group>
-  );
-};
-
-const SkillNeuralNetwork = () => {
-  const [activeTech, setActiveTech] = useState<any>(null);
-  
-  // Split technologies into 3 orbits
-  const orbits = useMemo(() => {
-    const orbit1 = technologies.slice(0, 8);
-    const orbit2 = technologies.slice(8, 16);
-    const orbit3 = technologies.slice(16);
-    
-    return [
-      { techs: orbit1, radius: 3, speed: 0.15, tilt: 0.3 },
-      { techs: orbit2, radius: 5, speed: -0.12, tilt: -0.2 },
-      { techs: orbit3, radius: 7, speed: 0.1, tilt: 0.4 },
-    ];
-  }, []);
-
-  return (
-    <div className="relative w-full h-[700px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
-      <Canvas gl={{ antialias: false, powerPreference: "high-performance" }} dpr={[1, 1.5]}>
-        <PerspectiveCamera makeDefault position={[0, 3, 8]} fov={70} />
-        <OrbitControls 
-          enableZoom={true}
-          autoRotate={false}
-          minDistance={5}
-          maxDistance={15}
-          enablePan={false}
-          maxPolarAngle={Math.PI / 1.6}
-          minPolarAngle={Math.PI / 4}
-          enableDamping={false}
-        />
-        
-        <ambientLight intensity={0.8} />
-        <pointLight position={[10, 10, 10]} intensity={2} color="#00ffc8" />
-        <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff6b6b" />
-        
-        {orbits.map((orbit, i) => (
-          <TechOrbit
-            key={i}
-            techs={orbit.techs}
-            radius={orbit.radius}
-            speed={orbit.speed}
-            tilt={orbit.tilt}
-            onHover={setActiveTech}
-          />
-        ))}
-        
-        {/* Central core - simplified */}
-        <mesh>
-          <sphereGeometry args={[0.8, 16, 16]} />
-          <meshBasicMaterial
-            color="#00ffc8"
-            transparent
-            opacity={0.3}
-          />
-        </mesh>
-      </Canvas>
-
-      {/* Info Overlay */}
-      <div className="absolute bottom-8 left-8 pointer-events-none">
+        {/* Animated gradient overlay */}
         <motion.div
-          key={activeTech?.name || 'idle'}
-          initial={{ opacity: 0, x: -20 }}
-          animate={activeTech ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-          transition={{ duration: 0.3 }}
-          className="bg-black/90 backdrop-blur-xl p-6 rounded-2xl border border-accent/20"
-        >
-          {activeTech && (
-            <div className="flex items-center gap-3">
-              <activeTech.icon className="w-10 h-10" style={{ color: activeTech.color }} />
-              <div>
-                <h3 className="text-2xl font-bold text-white uppercase tracking-tight">{activeTech.name}</h3>
-                <p className="text-[10px] text-accent uppercase tracking-wider">{activeTech.category}</p>
-              </div>
-            </div>
-          )}
-        </motion.div>
-      </div>
+          className="absolute inset-0 opacity-0"
+          style={{
+            background: `radial-gradient(circle at 50% 50%, ${tech.color}20, transparent 70%)`,
+          }}
+          animate={hovered ? {
+            opacity: 1,
+            scale: [1, 1.2, 1],
+            transition: {
+              duration: 1.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }
+          } : {
+            opacity: 0
+          }}
+        />
+        
+        {/* Top shine effect */}
+        <motion.div
+          className="absolute top-0 left-0 right-0 h-px"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${tech.color}80, transparent)`,
+          }}
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={hovered ? {
+            x: '100%',
+            opacity: [0, 1, 0],
+            transition: {
+              duration: 1,
+              ease: "easeInOut"
+            }
+          } : {
+            x: '-100%',
+            opacity: 0
+          }}
+        />
 
-      <div className="absolute top-8 right-8 text-right pointer-events-none">
-        <p className="text-[10px] text-white/30 uppercase tracking-widest">ORBITAL SYSTEM</p>
-        <p className="text-xs text-white/60 uppercase tracking-wide mt-1">Drag to Explore</p>
-      </div>
-    </div>
+        {/* Corner accents */}
+        <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-white/20 rounded-tl" />
+        <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-white/20 rounded-tr" />
+        <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-white/20 rounded-bl" />
+        <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-white/20 rounded-br" />
+        
+        {/* Animated corner glow */}
+        {hovered && (
+          <>
+            <motion.div
+              className="absolute top-0 left-0 w-8 h-8 rounded-full blur-xl"
+              style={{ backgroundColor: tech.color }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.4, scale: 1 }}
+              transition={{ duration: 0.3 }}
+            />
+            <motion.div
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full blur-xl"
+              style={{ backgroundColor: tech.color }}
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 0.4, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            />
+          </>
+        )}
+
+        {/* Icon */}
+        <motion.div
+          className="relative z-10 flex flex-col items-center gap-4"
+          animate={hovered ? { 
+            y: -8,
+            transition: {
+              type: "spring",
+              stiffness: 400,
+              damping: 17
+            }
+          } : { 
+            y: 0,
+            transition: {
+              type: "spring",
+              stiffness: 400,
+              damping: 17
+            }
+          }}
+        >
+          <motion.div
+            animate={hovered ? { 
+              rotate: [0, -10, 10, -10, 0],
+              scale: 1.15,
+              transition: {
+                rotate: {
+                  duration: 0.5,
+                  ease: "easeInOut"
+                },
+                scale: {
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 15
+                }
+              }
+            } : { 
+              rotate: 0, 
+              scale: 1,
+              transition: {
+                type: "spring",
+                stiffness: 300,
+                damping: 20
+              }
+            }}
+          >
+            <IconComponent
+              className="w-12 h-12 md:w-14 md:h-14"
+              style={{
+                color: hovered ? tech.color : '#ffffff',
+                filter: hovered 
+                  ? `drop-shadow(0 0 20px ${tech.color})` 
+                  : 'drop-shadow(0 0 8px rgba(255,255,255,0.3))',
+                transition: 'all 0.3s ease',
+              }}
+            />
+          </motion.div>
+
+          <div className="text-center">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">
+              {tech.name}
+            </h3>
+            <p 
+              className="text-[10px] uppercase tracking-widest font-medium"
+              style={{ color: hovered ? tech.color : '#666' }}
+            >
+              {tech.category}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Bottom accent line */}
+        <motion.div
+          className="absolute bottom-0 left-0 h-1 rounded-full"
+          style={{ backgroundColor: tech.color }}
+          initial={{ width: 0, x: 0 }}
+          animate={hovered ? { 
+            width: '100%',
+            transition: {
+              duration: 0.5,
+              ease: [0.65, 0, 0.35, 1]
+            }
+          } : { 
+            width: 0,
+            transition: {
+              duration: 0.4,
+              ease: [0.65, 0, 0.35, 1]
+            }
+          }}
+        />
+        
+        {/* Particle effect on hover */}
+        {hovered && (
+          <>
+            <motion.div
+              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
+              style={{ backgroundColor: tech.color }}
+              initial={{ scale: 0, x: '-50%', y: '-50%' }}
+              animate={{
+                scale: [0, 1, 0],
+                x: ['-50%', '-150%', '-250%'],
+                y: ['-50%', '-150%', '-250%'],
+                opacity: [0, 1, 0]
+              }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+            <motion.div
+              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
+              style={{ backgroundColor: tech.color }}
+              initial={{ scale: 0, x: '-50%', y: '-50%' }}
+              animate={{
+                scale: [0, 1, 0],
+                x: ['-50%', '50%', '150%'],
+                y: ['-50%', '-150%', '-250%'],
+                opacity: [0, 1, 0]
+              }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
+            />
+            <motion.div
+              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
+              style={{ backgroundColor: tech.color }}
+              initial={{ scale: 0, x: '-50%', y: '-50%' }}
+              animate={{
+                scale: [0, 1, 0],
+                x: ['-50%', '-150%', '-250%'],
+                y: ['-50%', '50%', '150%'],
+                opacity: [0, 1, 0]
+              }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            />
+            <motion.div
+              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
+              style={{ backgroundColor: tech.color }}
+              initial={{ scale: 0, x: '-50%', y: '-50%' }}
+              animate={{
+                scale: [0, 1, 0],
+                x: ['-50%', '50%', '150%'],
+                y: ['-50%', '50%', '150%'],
+                opacity: [0, 1, 0]
+              }}
+              transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
+            />
+          </>
+        )}
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -215,7 +341,7 @@ const TechStackSection = () => {
             </div>
             <h2 className="text-6xl md:text-9xl font-bold text-white uppercase tracking-tighter leading-[0.8]">
               TECHNICAL<br />
-              <span className="text-white/20">SYSTEMS</span>
+              <span className="text-white/20">STACK</span>
             </h2>
           </motion.div>
           
@@ -232,126 +358,40 @@ const TechStackSection = () => {
           </motion.div>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.98 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <SkillNeuralNetwork />
-        </motion.div>
+        {/* Tech Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          {technologies.map((tech, index) => (
+            <TechCard key={tech.name} tech={tech} index={index} />
+          ))}
+        </div>
 
-        {/* Tech Icons Grid - Simple */}
+        {/* Stats */}
         <motion.div
-          className="mt-20"
           initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
-          <div className="flex items-center justify-center mb-12">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-accent/30" />
-            <h3 className="mx-6 text-sm font-bold text-white/50 uppercase tracking-[0.3em]">
-              Tech Stack
-            </h3>
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-accent/30" />
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">23+</div>
+            <div className="text-xs text-white/40 uppercase tracking-widest">Technologies</div>
           </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-            {technologies.map((tech, i) => (
-              <TechIcon key={tech.name} tech={tech} index={i} isInView={isInView} />
-            ))}
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">8+</div>
+            <div className="text-xs text-white/40 uppercase tracking-widest">Categories</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">5+</div>
+            <div className="text-xs text-white/40 uppercase tracking-widest">AI Frameworks</div>
+          </div>
+          <div className="text-center">
+            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">100%</div>
+            <div className="text-xs text-white/40 uppercase tracking-widest">Production Ready</div>
           </div>
         </motion.div>
       </div>
     </section>
-  );
-};
-
-const TechIcon = ({ tech, index, isInView }: any) => {
-  const [isActive, setIsActive] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const IconComponent = tech.icon;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0, rotate: -180 }}
-      animate={isInView ? { opacity: 1, scale: 1, rotate: 0 } : { opacity: 0, scale: 0, rotate: -180 }}
-      exit={{ opacity: 0, scale: 0, rotate: 180 }}
-      transition={{
-        duration: 0.6,
-        delay: 0.5 + (index * 0.04),
-        ease: [0.16, 1, 0.3, 1],
-      }}
-      whileHover={{ scale: 1.2, y: -8 }}
-      whileTap={{ scale: 0.9 }}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
-      onClick={() => setIsActive(!isActive)}
-      className="relative cursor-pointer group"
-    >
-      {/* Glow effect on hover or active */}
-      <motion.div
-        className="absolute inset-0 rounded-full blur-xl"
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ 
-          opacity: (isHovered || isActive) ? 0.6 : 0,
-          scale: (isHovered || isActive) ? 1.5 : 0.5,
-        }}
-        transition={{ duration: 0.3 }}
-        style={{
-          background: (isHovered || isActive) ? 'rgba(34, 211, 238, 0.5)' : 'transparent',
-          visibility: (isHovered || isActive) ? 'visible' : 'hidden',
-        }}
-      />
-
-      {/* Icon with rotation */}
-      <motion.div
-        animate={{ rotate: isHovered ? 360 : 0 }}
-        transition={{ duration: 0.6, ease: 'easeInOut' }}
-        className="relative"
-      >
-        <IconComponent
-          className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300"
-          style={{
-            color: (isHovered || isActive) ? '#22d3ee' : '#666666',
-            filter: (isHovered || isActive)
-              ? 'drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)) drop-shadow(0 0 32px rgba(34, 211, 238, 0.4))' 
-              : 'drop-shadow(0 0 8px rgba(102, 102, 102, 0.3))',
-          }}
-        />
-      </motion.div>
-
-      {/* Tooltip on hover */}
-      <motion.div
-        className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap pointer-events-none"
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : -10 }}
-        transition={{ duration: 0.2 }}
-      >
-        <div className="px-3 py-1.5 rounded-lg bg-black/90 backdrop-blur-md border border-cyan-400/30">
-          <p className="text-xs font-bold text-cyan-400">{tech.name}</p>
-        </div>
-      </motion.div>
-
-      {/* Active ring indicator */}
-      {isActive && (
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-cyan-400"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1.3, opacity: 0 }}
-          transition={{ duration: 1, repeat: Infinity }}
-        />
-      )}
-
-      {/* Hover ring pulse */}
-      {isHovered && (
-        <motion.div
-          className="absolute inset-0 rounded-full border-2 border-cyan-400/50"
-          initial={{ scale: 1, opacity: 0.5 }}
-          animate={{ scale: 1.5, opacity: 0 }}
-          transition={{ duration: 0.8, repeat: Infinity }}
-        />
-      )}
-    </motion.div>
   );
 };
 
