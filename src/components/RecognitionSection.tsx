@@ -78,17 +78,17 @@ const AchievementCard = ({ item, index }: { item: typeof recognitions[0]; index:
       style={{
         background: 'rgba(17, 17, 20, 0.95)',
         border: '1px solid rgba(255,255,255,0.08)',
+        minHeight: '400px',
       }}
       whileHover={{
         scale: 1.02,
-        border: `1px solid ${item.color}40`,
         transition: { duration: 0.3 }
       }}
     >
       {/* Magnetic spotlight */}
       {hovered && (
         <motion.div
-          className="absolute rounded-full pointer-events-none blur-3xl"
+          className="absolute rounded-full pointer-events-none blur-3xl z-10"
           style={{
             width: '400px',
             height: '400px',
@@ -109,123 +109,163 @@ const AchievementCard = ({ item, index }: { item: typeof recognitions[0]; index:
 
       {/* Animated gradient border */}
       <motion.div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none z-10"
         style={{
-          background: `linear-gradient(135deg, ${item.color}30, transparent, ${item.color}30)`,
-        }}
-        animate={hovered ? {
-          backgroundPosition: ['0% 0%', '100% 100%'],
-        } : {}}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: "linear"
+          background: `linear-gradient(135deg, ${item.color}20, transparent, ${item.color}20)`,
         }}
       />
 
-      {/* Image section */}
-      <div className="relative h-48 md:h-64 overflow-hidden">
-        <motion.img
-          src={item.image}
-          alt={item.title}
-          className="w-full h-full object-cover"
-          animate={hovered ? {
-            scale: 1.1,
-          } : {
-            scale: 1,
-          }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-        />
-        
-        {/* Gradient overlay */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: `linear-gradient(to bottom, transparent 0%, rgba(17,17,20,0.9) 100%)`
-          }}
-        />
-
-        {/* Floating icon */}
-        <motion.div
-          className="absolute top-4 right-4 w-12 h-12 rounded-2xl flex items-center justify-center backdrop-blur-md"
-          style={{
-            background: `${item.color}20`,
-            border: `1px solid ${item.color}40`,
-          }}
-          animate={hovered ? {
-            rotate: [0, -10, 10, -10, 0],
-            scale: [1, 1.1, 1],
-          } : {
-            rotate: 0,
-            scale: 1,
-          }}
-          transition={{
-            duration: 0.6,
-            ease: "easeInOut"
-          }}
-        >
-          <IconComponent 
-            className="w-6 h-6" 
-            style={{ color: item.color }}
+      {/* Split layout: Image on left, content on right */}
+      <div className="relative flex flex-col md:flex-row h-full">
+        {/* Image section - circular cutout on left */}
+        <div className="relative w-full md:w-2/5 h-64 md:h-full overflow-hidden">
+          {/* Circular mask effect */}
+          <motion.div
+            className="absolute inset-0 z-20"
+            style={{
+              background: `radial-gradient(circle at 80% 50%, transparent 40%, rgba(17,17,20,0.95) 70%)`,
+            }}
           />
-        </motion.div>
+          
+          <motion.img
+            src={item.image}
+            alt={item.title}
+            className="w-full h-full object-cover"
+            animate={hovered ? {
+              scale: 1.15,
+              rotate: 2,
+            } : {
+              scale: 1,
+              rotate: 0,
+            }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          />
 
-        {/* Category badge */}
-        <motion.div
-          className="absolute top-4 left-4 px-3 py-1.5 rounded-full backdrop-blur-md text-xs font-bold uppercase tracking-wider"
-          style={{
-            background: `${item.color}30`,
-            color: item.color,
-            border: `1px solid ${item.color}50`,
-          }}
-          whileHover={{ scale: 1.05 }}
-        >
-          {item.category}
-        </motion.div>
+          {/* Glow overlay on image */}
+          <motion.div
+            className="absolute inset-0 z-10"
+            style={{
+              background: `radial-gradient(circle at center, ${item.color}30, transparent 70%)`,
+              opacity: 0,
+            }}
+            animate={hovered ? { opacity: 0.6 } : { opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          />
+
+          {/* Floating icon */}
+          <motion.div
+            className="absolute top-6 left-6 w-16 h-16 rounded-2xl flex items-center justify-center backdrop-blur-xl z-30"
+            style={{
+              background: `${item.color}15`,
+              border: `2px solid ${item.color}40`,
+              boxShadow: `0 0 30px ${item.color}30`,
+            }}
+            animate={hovered ? {
+              rotate: [0, -15, 15, -15, 0],
+              scale: [1, 1.15, 1],
+              y: [0, -8, 0],
+            } : {
+              rotate: 0,
+              scale: 1,
+              y: 0,
+            }}
+            transition={{
+              duration: 0.8,
+              ease: "easeInOut"
+            }}
+          >
+            <IconComponent 
+              className="w-8 h-8" 
+              style={{ color: item.color }}
+            />
+          </motion.div>
+        </div>
+
+        {/* Content section */}
+        <div className="relative flex-1 p-8 md:p-10 flex flex-col justify-center">
+          {/* Category badge */}
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md text-xs font-bold uppercase tracking-wider mb-6 w-fit"
+            style={{
+              background: `${item.color}20`,
+              color: item.color,
+              border: `1px solid ${item.color}40`,
+            }}
+            whileHover={{ scale: 1.05, x: 5 }}
+          >
+            <div 
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: item.color }}
+            />
+            {item.category}
+          </motion.div>
+
+          {/* Year */}
+          <motion.p 
+            className="text-xs text-white/30 uppercase tracking-[0.3em] mb-4 font-bold"
+            animate={hovered ? { x: [0, 8, 0] } : { x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            {item.year}
+          </motion.p>
+
+          {/* Title */}
+          <motion.h3 
+            className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-6 uppercase tracking-tight leading-tight"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            animate={hovered ? {
+              color: item.color,
+              x: 5,
+            } : {
+              color: '#ffffff',
+              x: 0,
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            {item.title}
+          </motion.h3>
+
+          {/* Description */}
+          <motion.p 
+            className="text-sm md:text-base text-white/50 leading-relaxed mb-8"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            animate={hovered ? { opacity: 0.8 } : { opacity: 0.5 }}
+          >
+            {item.description}
+          </motion.p>
+
+          {/* Bottom accent line */}
+          <motion.div
+            className="h-1 rounded-full"
+            style={{ backgroundColor: item.color }}
+            initial={{ width: 0 }}
+            animate={hovered ? { width: '100%' } : { width: '60px' }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          />
+        </div>
       </div>
 
-      {/* Content section */}
-      <div className="relative p-6 md:p-8">
-        {/* Year */}
-        <motion.p 
-          className="text-xs text-white/40 uppercase tracking-widest mb-3"
-          animate={hovered ? { x: [0, 5, 0] } : { x: 0 }}
-          transition={{ duration: 0.4 }}
-        >
-          {item.year}
-        </motion.p>
-
-        {/* Title */}
-        <motion.h3 
-          className="text-xl md:text-2xl font-bold text-white mb-3 uppercase tracking-tight"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
-          animate={hovered ? {
-            color: item.color,
-          } : {
-            color: '#ffffff',
-          }}
-          transition={{ duration: 0.3 }}
-        >
-          {item.title}
-        </motion.h3>
-
-        {/* Description */}
-        <p 
-          className="text-sm text-white/50 leading-relaxed"
-          style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
-        >
-          {item.description}
-        </p>
-
-        {/* Hover indicator */}
-        <motion.div
-          className="absolute bottom-0 left-0 h-1 rounded-full"
-          style={{ backgroundColor: item.color }}
-          initial={{ width: 0 }}
-          animate={hovered ? { width: '100%' } : { width: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-        />
-      </div>
+      {/* Corner accents */}
+      {hovered && (
+        <>
+          {/* Top left */}
+          <motion.div
+            className="absolute top-0 left-0 w-20 h-20 border-t-2 border-l-2 rounded-tl-3xl z-30"
+            style={{ borderColor: item.color }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: "backOut" }}
+          />
+          {/* Bottom right */}
+          <motion.div
+            className="absolute bottom-0 right-0 w-20 h-20 border-b-2 border-r-2 rounded-br-3xl z-30"
+            style={{ borderColor: item.color }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: "backOut", delay: 0.1 }}
+          />
+        </>
+      )}
 
       {/* Particle burst on hover */}
       {hovered && (
@@ -238,7 +278,7 @@ const AchievementCard = ({ item, index }: { item: typeof recognitions[0]; index:
                 backgroundColor: item.color,
                 left: '50%',
                 top: '50%',
-                boxShadow: `0 0 10px ${item.color}`,
+                boxShadow: `0 0 15px ${item.color}`,
               }}
               initial={{ 
                 x: '-50%', 
@@ -247,15 +287,15 @@ const AchievementCard = ({ item, index }: { item: typeof recognitions[0]; index:
                 opacity: 0
               }}
               animate={{
-                x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 80}px)`,
-                y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 80}px)`,
-                scale: [0, 1, 0],
+                x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 100}px)`,
+                y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 100}px)`,
+                scale: [0, 1.2, 0],
                 opacity: [0, 1, 0],
               }}
               transition={{
-                duration: 1.5,
+                duration: 1.2,
                 ease: "easeOut",
-                delay: i * 0.05
+                delay: i * 0.04
               }}
             />
           ))}
