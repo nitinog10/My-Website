@@ -1,24 +1,132 @@
 import { useRef, useEffect, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Sphere, Line } from '@react-three/drei';
+import { OrbitControls, Sphere, Line, Text3D, Center } from '@react-three/drei';
 import * as THREE from 'three';
+import { X } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 const techStack = [
-  { name: 'Python', category: 'Language', color: '#3776AB', x: 2, y: 1, z: 0 },
-  { name: 'TypeScript', category: 'Language', color: '#3178C6', x: -2, y: 1, z: 0 },
-  { name: 'React', category: 'Frontend', color: '#61DAFB', x: 0, y: 2, z: 1 },
-  { name: 'Next.js', category: 'Frontend', color: '#FFFFFF', x: 1, y: -1, z: 2 },
-  { name: 'Node.js', category: 'Backend', color: '#339933', x: -1, y: -1, z: -2 },
-  { name: 'PyTorch', category: 'AI/ML', color: '#EE4C2C', x: 2, y: 0, z: -1 },
-  { name: 'TensorFlow', category: 'AI/ML', color: '#FF6F00', x: -2, y: 0, z: 1 },
-  { name: 'OpenAI', category: 'AI/ML', color: '#412991', x: 0, y: -2, z: 0 },
-  { name: 'Docker', category: 'DevOps', color: '#2496ED', x: 1.5, y: 1.5, z: -1 },
-  { name: 'AWS', category: 'Cloud', color: '#FF9900', x: -1.5, y: -1.5, z: 1 },
+  { 
+    name: 'Python', 
+    category: 'AI/ML', 
+    color: '#3776AB', 
+    x: 2, y: 1, z: 0,
+    description: 'Primary language for AI/ML development',
+    usedIn: 'AtmoPredict, AirPulse, Campus Mitra',
+    projects: ['Climate Intelligence', 'Air Quality Network']
+  },
+  { 
+    name: 'PyTorch', 
+    category: 'AI/ML', 
+    color: '#EE4C2C', 
+    x: 2.5, y: 0.5, z: -0.5,
+    description: 'Deep learning framework for neural networks',
+    usedIn: 'Computer Vision, NLP Models',
+    projects: ['Object Detection', 'Model Fine-tuning']
+  },
+  { 
+    name: 'TensorFlow', 
+    category: 'AI/ML', 
+    color: '#FF6F00', 
+    x: 2, y: -0.5, z: 0.5,
+    description: 'ML platform for production systems',
+    usedIn: 'Predictive Models, Data Pipelines',
+    projects: ['Climate Prediction', 'AQI Forecasting']
+  },
+  { 
+    name: 'OpenAI', 
+    category: 'AI/ML', 
+    color: '#412991', 
+    x: 1.5, y: 0, z: 0,
+    description: 'LLM integration and prompt engineering',
+    usedIn: 'Campus Mitra, RAG Systems',
+    projects: ['AI Assistant', 'Multi-Agent Systems']
+  },
+  { 
+    name: 'TypeScript', 
+    category: 'Frontend', 
+    color: '#3178C6', 
+    x: -2, y: 1, z: 0,
+    description: 'Type-safe JavaScript for scalable apps',
+    usedIn: 'All web applications',
+    projects: ['Portfolio', 'LMS Platform']
+  },
+  { 
+    name: 'React', 
+    category: 'Frontend', 
+    color: '#61DAFB', 
+    x: -2.5, y: 0.5, z: 0.5,
+    description: 'UI library for interactive interfaces',
+    usedIn: 'Foundation LMS, Portfolio',
+    projects: ['Learning Platform', 'Web Apps']
+  },
+  { 
+    name: 'Next.js', 
+    category: 'Frontend', 
+    color: '#FFFFFF', 
+    x: -2, y: 0, z: -0.5,
+    description: 'React framework for production',
+    usedIn: 'Full-stack applications',
+    projects: ['Enterprise Apps', 'API Routes']
+  },
+  { 
+    name: 'Node.js', 
+    category: 'Backend', 
+    color: '#339933', 
+    x: 0, y: -2, z: 0,
+    description: 'JavaScript runtime for backend services',
+    usedIn: 'API Development, Microservices',
+    projects: ['REST APIs', 'Real-time Services']
+  },
+  { 
+    name: 'FastAPI', 
+    category: 'Backend', 
+    color: '#009688', 
+    x: 0.5, y: -2.5, z: 0.5,
+    description: 'High-performance Python API framework',
+    usedIn: 'AI Model Serving, Data APIs',
+    projects: ['ML Endpoints', 'Data Processing']
+  },
+  { 
+    name: 'Docker', 
+    category: 'DevOps', 
+    color: '#2496ED', 
+    x: 0, y: 2, z: 1,
+    description: 'Containerization for deployment',
+    usedIn: 'All production systems',
+    projects: ['Microservices', 'CI/CD']
+  },
+  { 
+    name: 'Kubernetes', 
+    category: 'DevOps', 
+    color: '#326CE5', 
+    x: 0.5, y: 2.5, z: 0.5,
+    description: 'Container orchestration at scale',
+    usedIn: 'Production deployments',
+    projects: ['Scalable Systems', 'Auto-scaling']
+  },
+  { 
+    name: 'AWS', 
+    category: 'Cloud', 
+    color: '#FF9900', 
+    x: -1.5, y: -1.5, z: 1,
+    description: 'Cloud infrastructure and services',
+    usedIn: 'Hosting, Storage, Compute',
+    projects: ['Production Apps', 'Data Storage']
+  },
+  { 
+    name: 'PostgreSQL', 
+    category: 'Database', 
+    color: '#4169E1', 
+    x: 1.5, y: -1.5, z: -1,
+    description: 'Relational database for structured data',
+    usedIn: 'Data persistence, Analytics',
+    projects: ['User Data', 'Transactions']
+  },
 ];
 
 const TechNode = ({ tech, index, onHover }: any) => {
