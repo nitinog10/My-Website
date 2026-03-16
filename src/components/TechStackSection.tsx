@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Sphere, MeshDistortMaterial, Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
+import { Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import {
   SiPython, SiTypescript, SiJavascript, SiReact, SiNextdotjs,
@@ -38,199 +38,168 @@ const technologies = [
   { icon: SiGreensock, name: "GSAP", color: "#88CE02", category: "Animation" },
 ];
 
-const TechNode = ({ tech, position, index, onHover }: any) => {
-  const groupRef = useRef<THREE.Group>(null!);
+const TechNode = ({ tech, position, onHover }: any) => {
   const [hovered, setHovered] = useState(false);
   const IconComponent = tech.icon;
 
+  return (
+    <group
+      position={position}
+      onPointerOver={() => { setHovered(true); onHover(tech); }}
+      onPointerOut={() => { setHovered(false); onHover(null); }}
+    >
+      {/* Glowing sphere */}
+      <mesh>
+        <sphereGeometry args={[0.35, 32, 32]} />
+        <meshStandardMaterial
+          color={tech.color}
+          emissive={tech.color}
+          emissiveIntensity={hovered ? 1.8 : 0.6}
+          transparent
+          opacity={hovered ? 0.9 : 0.5}
+        />
+      </mesh>
+      
+      {/* Icon */}
+      <Html
+        center
+        distanceFactor={3}
+        position={[0, 0, 0]}
+        style={{
+          transition: 'all 0.3s ease',
+          pointerEvents: 'none',
+        }}
+      >
+        <IconComponent 
+          style={{ 
+            color: '#ffffff', 
+            fontSize: hovered ? '44px' : '32px',
+            filter: hovered ? `drop-shadow(0 0 20px ${tech.color})` : 'none',
+            transition: 'all 0.3s ease',
+          }} 
+        />
+      </Html>
+    </group>
+  );
+};
+
+const TechOrbit = ({ techs, radius, speed, tilt, onHover }: any) => {
+  const groupRef = useRef<THREE.Group>(null!);
+
   useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    // Gentle floating animation only
-    groupRef.current.position.y = position[1] + Math.sin(time * 0.4 + index * 0.5) * 0.2;
-    groupRef.current.position.x = position[0] + Math.cos(time * 0.3 + index * 0.3) * 0.15;
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = state.clock.getElapsedTime() * speed;
   });
 
   return (
-    <Float speed={1} rotationIntensity={0.2} floatIntensity={0.5}>
-      <group
-        ref={groupRef}
-        position={position}
-        onPointerOver={() => { setHovered(true); onHover(tech); }}
-        onPointerOut={() => { setHovered(false); onHover(null); }}
-      >
-        {/* Outer glow sphere */}
-        <mesh>
-          <sphereGeometry args={[0.85, 32, 32]} />
-          <meshBasicMaterial
-            color={tech.color}
-            transparent
-            opacity={hovered ? 0.2 : 0.06}
-            side={THREE.BackSide}
-          />
-        </mesh>
+    <group ref={groupRef} rotation={[tilt, 0, 0]}>
+      {/* Orbit ring */}
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[radius, 0.015, 16, 100]} />
+        <meshBasicMaterial color="#00ffc8" transparent opacity={0.2} />
+      </mesh>
+
+      {techs.map((tech: any, i: number) => {
+        const angle = (i / techs.length) * Math.PI * 2;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
         
-        {/* Main sphere */}
-        <mesh>
-          <sphereGeometry args={[0.65, 32, 32]} />
-          <MeshDistortMaterial
-            color={hovered ? tech.color : "#0f0f0f"}
-            speed={1}
-            distort={0.15}
-            radius={1}
-            emissive={tech.color}
-            emissiveIntensity={hovered ? 0.9 : 0.15}
-            transparent
-            opacity={hovered ? 0.7 : 0.35}
-            metalness={0.9}
-            roughness={0.1}
+        return (
+          <TechNode
+            key={tech.name}
+            tech={tech}
+            position={[x, 0, z]}
+            onHover={onHover}
           />
-        </mesh>
-        
-        {/* Icon - always facing camera */}
-        <Html
-          center
-          distanceFactor={5.5}
-          position={[0, 0, 0]}
-          style={{
-            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            pointerEvents: 'none',
-            userSelect: 'none',
-          }}
-        >
-          <motion.div
-            animate={{ 
-              rotate: 360,
-              scale: hovered ? 1.3 : 1,
-            }}
-            transition={{ 
-              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-              scale: { duration: 0.3 }
-            }}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-            }}
-          >
-            <IconComponent 
-              style={{ 
-                color: hovered ? tech.color : '#ffffff', 
-                fontSize: '52px',
-                filter: hovered 
-                  ? `drop-shadow(0 0 24px ${tech.color}) drop-shadow(0 0 48px ${tech.color})` 
-                  : 'drop-shadow(0 0 10px rgba(255,255,255,0.4))',
-                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              }} 
-            />
-          </motion.div>
-        </Html>
-      </group>
-    </Float>
+        );
+      })}
+    </group>
   );
 };
 
 const SkillNeuralNetwork = () => {
   const [activeTech, setActiveTech] = useState<any>(null);
-  const techPositions = useMemo(() => {
-    return technologies.map((_, i) => {
-      // Fibonacci sphere distribution for even spacing
-      const goldenRatio = (1 + Math.sqrt(5)) / 2;
-      const goldenAngle = 2 * Math.PI / (goldenRatio * goldenRatio);
-      
-      const theta = goldenAngle * i;
-      const phi = Math.acos(1 - 2 * (i + 0.5) / technologies.length);
-      const radius = 9; // Increased radius for better spacing
-      
-      return [
-        radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.sin(phi) * Math.sin(theta),
-        radius * Math.cos(phi)
-      ] as [number, number, number];
-    });
+  
+  // Split technologies into 3 orbits
+  const orbits = useMemo(() => {
+    const orbit1 = technologies.slice(0, 8);
+    const orbit2 = technologies.slice(8, 16);
+    const orbit3 = technologies.slice(16);
+    
+    return [
+      { techs: orbit1, radius: 4, speed: 0.15, tilt: 0.3 },
+      { techs: orbit2, radius: 6.5, speed: -0.12, tilt: -0.2 },
+      { techs: orbit3, radius: 9, speed: 0.1, tilt: 0.4 },
+    ];
   }, []);
 
   return (
-    <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5 cursor-move">
-      <Canvas camera={{ position: [0, 0, 22], fov: 45 }}>
-        <PerspectiveCamera makeDefault position={[0, 0, 22]} fov={45} />
+    <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
+      <Canvas>
+        <PerspectiveCamera makeDefault position={[0, 8, 14]} fov={50} />
         <OrbitControls 
-          enableZoom={true} 
-          autoRotate 
-          autoRotateSpeed={0.25}
-          minDistance={18}
-          maxDistance={35}
+          enableZoom={true}
+          autoRotate={false}
+          minDistance={10}
+          maxDistance={25}
           enablePan={false}
-          dampingFactor={0.05}
-          rotateSpeed={0.5}
+          maxPolarAngle={Math.PI / 1.6}
+          minPolarAngle={Math.PI / 4}
         />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[20, 20, 20]} intensity={2.5} color="#00ffc8" />
-        <pointLight position={[-20, -20, -20]} intensity={1.5} color="#ff6b6b" />
-        <pointLight position={[0, 0, 20]} intensity={2} color="#4ECDC4" />
-        <spotLight position={[0, 25, 0]} intensity={1.5} angle={0.5} penumbra={1} color="#ffffff" />
         
-        {technologies.map((tech, i) => (
-          <TechNode 
-            key={tech.name} 
-            tech={tech} 
-            position={techPositions[i]} 
-            index={i}
+        <ambientLight intensity={0.4} />
+        <pointLight position={[10, 10, 10]} intensity={2} color="#00ffc8" />
+        <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff6b6b" />
+        <pointLight position={[0, 0, 10]} intensity={1.5} color="#4ECDC4" />
+        
+        {orbits.map((orbit, i) => (
+          <TechOrbit
+            key={i}
+            techs={orbit.techs}
+            radius={orbit.radius}
+            speed={orbit.speed}
+            tilt={orbit.tilt}
             onHover={setActiveTech}
           />
         ))}
         
-        {/* Central core with pulsing effect */}
-        <Sphere args={[1.2, 32, 32]} position={[0, 0, 0]}>
+        {/* Central core */}
+        <mesh>
+          <sphereGeometry args={[0.8, 32, 32]} />
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
-            emissiveIntensity={0.5}
+            emissiveIntensity={0.8}
             transparent
-            opacity={0.2}
-            wireframe
+            opacity={0.3}
           />
-        </Sphere>
+        </mesh>
       </Canvas>
 
       {/* Info Overlay */}
       <div className="absolute bottom-8 left-8 pointer-events-none">
         <motion.div
           key={activeTech?.name || 'idle'}
-          initial={{ opacity: 0, x: -20, scale: 0.9 }}
-          animate={activeTech ? { opacity: 1, x: 0, scale: 1 } : { opacity: 0, x: -20, scale: 0.9 }}
-          className="bg-black/80 backdrop-blur-xl p-8 rounded-3xl border border-accent/20 shadow-[0_0_50px_rgba(0,255,200,0.1)]"
+          initial={{ opacity: 0, x: -20 }}
+          animate={activeTech ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+          className="bg-black/90 backdrop-blur-xl p-6 rounded-2xl border border-accent/20"
         >
           {activeTech && (
-            <>
-              <div className="flex items-center gap-4 mb-3">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                >
-                  <activeTech.icon className="w-8 h-8 md:w-10 md:h-10" style={{ color: activeTech.color }} />
-                </motion.div>
-                <div>
-                    <h3 className="text-2xl font-bold text-white uppercase tracking-tighter leading-none mb-1">{activeTech.name}</h3>
-                    <p className="text-[10px] text-accent uppercase tracking-[0.3em] font-medium">{activeTech.category}</p>
-                </div>
+            <div className="flex items-center gap-3">
+              <activeTech.icon className="w-10 h-10" style={{ color: activeTech.color }} />
+              <div>
+                <h3 className="text-2xl font-bold text-white uppercase tracking-tight">{activeTech.name}</h3>
+                <p className="text-[10px] text-accent uppercase tracking-wider">{activeTech.category}</p>
               </div>
-              <p className="text-white/40 text-xs mt-4 uppercase tracking-widest font-bold">Domain Expertise</p>
-              <div className="h-1 w-full bg-white/5 rounded-full mt-2 overflow-hidden">
-                <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: "90%" }}
-                    className="h-full bg-accent"
-                    transition={{ duration: 1 }}
-                />
-              </div>
-            </>
+            </div>
           )}
         </motion.div>
       </div>
 
       <div className="absolute top-8 right-8 text-right pointer-events-none">
-        <p className="text-[10px] text-white/30 uppercase tracking-[0.4em] mb-1">TECH ECOSYSTEM V2.0</p>
-        <p className="text-xs text-white/60 uppercase tracking-[0.1em]">Drag to Rotate • Scroll to Zoom</p>
+        <p className="text-[10px] text-white/30 uppercase tracking-widest">ORBITAL SYSTEM</p>
+        <p className="text-xs text-white/60 uppercase tracking-wide mt-1">Drag to Explore</p>
       </div>
     </div>
   );
