@@ -48,19 +48,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
       onPointerOver={() => { setHovered(true); onHover(tech); }}
       onPointerOut={() => { setHovered(false); onHover(null); }}
     >
-      {/* Glowing sphere */}
-      <mesh>
-        <sphereGeometry args={[0.6, 32, 32]} />
-        <meshStandardMaterial
-          color={tech.color}
-          emissive={tech.color}
-          emissiveIntensity={hovered ? 2.5 : 1.2}
-          transparent
-          opacity={hovered ? 1 : 0.7}
-        />
-      </mesh>
-      
-      {/* Icon - clean without border */}
+      {/* Icon only - no sphere */}
       <Html
         center
         distanceFactor={1.2}
