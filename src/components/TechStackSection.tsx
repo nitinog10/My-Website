@@ -190,6 +190,23 @@ const TechCard = ({ tech, index }: any) => {
                 }
               } : {}}
             >
+              {/* Always visible subtle glow */}
+              <motion.div
+                className="absolute inset-0 rounded-full blur-lg pointer-events-none"
+                style={{
+                  backgroundColor: tech.color,
+                }}
+                animate={{
+                  opacity: hovered ? [0.3, 0.5, 0.3] : [0.1, 0.15, 0.1],
+                  scale: hovered ? [1, 1.2, 1] : [1, 1.05, 1],
+                }}
+                transition={{
+                  duration: hovered ? 1.5 : 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              
               {/* Border glow on hover */}
               {hovered && (
                 <motion.div
@@ -213,7 +230,7 @@ const TechCard = ({ tech, index }: any) => {
                 style={{
                   color: hovered ? tech.color : '#888888',
                   filter: hovered 
-                    ? `drop-shadow(0 0 20px ${tech.color})` 
+                    ? `drop-shadow(0 0 20px ${tech.color}) brightness(1.2)` 
                     : 'none',
                   transition: 'all 0.3s ease',
                 }}
