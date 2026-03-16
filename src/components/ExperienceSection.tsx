@@ -136,7 +136,7 @@ const ExperienceSection = () => {
                 A live chronology of leadership, internships, and builder roles. Scroll drives the rail and each milestone enters, then exits, with clear directional motion.
               </p>
             </div>
-          </div>
+          </aside>
 
           <div data-exp-list className="relative col-span-12 md:col-span-8 pl-0 md:pl-12">
             <div className="absolute left-2 md:left-0 top-2 bottom-2 w-px bg-white/10" />
