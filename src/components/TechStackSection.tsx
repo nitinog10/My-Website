@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Sphere, MeshDistortMaterial, Text, PerspectiveCamera, OrbitControls } from "@react-three/drei";
+import { Float, Sphere, MeshDistortMaterial, Html, PerspectiveCamera, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import {
   SiPython, SiTypescript, SiJavascript, SiReact, SiNextdotjs,
@@ -34,43 +34,63 @@ const technologies = [
 ];
 
 const TechNode = ({ tech, position, index, onHover }: any) => {
-  const meshRef = useRef<THREE.Mesh>(null!);
+  const groupRef = useRef<THREE.Group>(null!);
   const [hovered, setHovered] = useState(false);
+  const IconComponent = tech.icon;
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    meshRef.current.position.y = position[1] + Math.sin(time + index) * 0.2;
-    meshRef.current.rotation.x = Math.sin(time / 2) * 0.1;
-    meshRef.current.rotation.y = Math.cos(time / 2) * 0.1;
+    groupRef.current.position.y = position[1] + Math.sin(time + index) * 0.2;
+    groupRef.current.rotation.x = Math.sin(time / 2) * 0.1;
+    groupRef.current.rotation.y = Math.cos(time / 2) * 0.1;
   });
 
   return (
     <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
-      <mesh
-        ref={meshRef}
+      <group
+        ref={groupRef}
         position={position}
         onPointerOver={() => { setHovered(true); onHover(tech); }}
         onPointerOut={() => { setHovered(false); onHover(null); }}
       >
-        <sphereGeometry args={[0.4, 32, 32]} />
-        <MeshDistortMaterial
-          color={hovered ? tech.color : "#333"}
-          speed={3}
-          distort={0.4}
-          radius={1}
-          emissive={hovered ? tech.color : "#000"}
-          emissiveIntensity={hovered ? 2 : 0}
-        />
-        <Text
-          position={[0, -0.8, 0]}
-          fontSize={0.25}
-          color="white"
-          anchorX="center"
-          anchorY="middle"
+        <mesh>
+          <sphereGeometry args={[0.4, 32, 32]} />
+          <MeshDistortMaterial
+            color={hovered ? tech.color : "#333"}
+            speed={3}
+            distort={0.4}
+            radius={1}
+            emissive={hovered ? tech.color : "#000"}
+            emissiveIntensity={hovered ? 2 : 0}
+            transparent
+            opacity={0.3}
+          />
+        </mesh>
+        <Html
+          center
+          distanceFactor={10}
+          position={[0, 0, 0]}
+          style={{
+            transition: 'all 0.3s',
+            opacity: 1,
+            transform: hovered ? 'scale(1.2)' : 'scale(1)',
+          }}
         >
-          {tech.name}
-        </Text>
-      </mesh>
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <IconComponent 
+              style={{ 
+                color: tech.color, 
+                fontSize: '32px',
+                filter: `drop-shadow(0 0 8px ${tech.color})`,
+              }} 
+            />
+          </motion.div>
+        </Html>
+      </group>
     </Float>
   );
 };
@@ -136,7 +156,12 @@ const SkillNeuralNetwork = () => {
           {activeTech && (
             <>
               <div className="flex items-center gap-4 mb-3">
-                <activeTech.icon className="w-8 h-8 md:w-10 md:h-10" style={{ color: activeTech.color }} />
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <activeTech.icon className="w-8 h-8 md:w-10 md:h-10" style={{ color: activeTech.color }} />
+                </motion.div>
                 <div>
                     <h3 className="text-2xl font-bold text-white uppercase tracking-tighter leading-none mb-1">{activeTech.name}</h3>
                     <p className="text-[10px] text-accent uppercase tracking-[0.3em] font-medium">{activeTech.category}</p>
@@ -211,25 +236,35 @@ const TechStackSection = () => {
           <SkillNeuralNetwork />
         </motion.div>
 
-        <div className="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-12">
-            {[
-                { title: "Languages", list: "Python, TypeScript, JavaScript" },
-                { title: "AI/ML", list: "OpenAI, TensorFlow, PyTorch" },
-                { title: "Production", list: "Kubernetes, Docker, AWS, GCP" },
-                { title: "Frameworks", list: "React, Next.js, Node.js" }
-            ].map((cat, i) => (
+        <div className="mt-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {technologies.map((tech, i) => (
                 <motion.div 
-                    key={cat.title}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                    transition={{ delay: 0.6 + (i * 0.1) }}
-                    className="group"
+                    key={tech.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ delay: 0.6 + (i * 0.05) }}
+                    className="group relative p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+                    whileHover={{ y: -4, scale: 1.02 }}
                 >
-                    <div className="flex items-center gap-3 mb-4 group-hover:translate-x-1 transition-transform">
-                        <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                        <h4 className="text-[10px] text-white/30 uppercase tracking-[0.4em] font-bold">{cat.title}</h4>
-                    </div>
-                    <p className="text-sm md:text-md text-white/70 font-medium tracking-tight">{cat.list}</p>
+                    {/* Rotating icon on hover */}
+                    <motion.div
+                      className="flex items-center justify-center mb-4"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6, ease: "easeInOut" }}
+                    >
+                      <tech.icon className="w-10 h-10 md:w-12 md:h-12" style={{ color: tech.color }} />
+                    </motion.div>
+                    
+                    <h4 className="text-sm font-bold text-white text-center mb-1">{tech.name}</h4>
+                    <p className="text-xs text-white/40 text-center uppercase tracking-wider">{tech.category}</p>
+                    
+                    {/* Hover glow effect */}
+                    <motion.div
+                      className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                      style={{
+                        background: `radial-gradient(circle at center, ${tech.color}15, transparent)`,
+                      }}
+                    />
                 </motion.div>
             ))}
         </div>
