@@ -10,7 +10,7 @@ const recognitions = [
     description: 'Global hackathon winner with innovative weather prediction solution using NASA\'s Earth observation data and machine learning.',
     image: '/Nasa space apps challenge.jpeg',
     icon: Trophy,
-    color: '#FFD700',
+    color: '#00ffc8',
     size: 'large'
   },
   { 
@@ -20,7 +20,7 @@ const recognitions = [
     description: 'Consistently recognized across 15+ hackathons for innovative AI solutions and technical excellence.',
     image: '/15+ hackathons.jpeg',
     icon: Star,
-    color: '#FF6B6B',
+    color: '#60d5f0',
     size: 'medium'
   },
   { 
@@ -30,7 +30,7 @@ const recognitions = [
     description: 'Multiple hackathon victories showcasing expertise in AI, full-stack development, and problem-solving.',
     image: '/abc.jpeg',
     icon: Award,
-    color: '#4ECDC4',
+    color: '#00ffc8',
     size: 'medium'
   },
   { 
@@ -40,7 +40,7 @@ const recognitions = [
     description: 'First place at national ideathon for developing innovative tech solutions addressing real-world challenges.',
     image: '/national level ideathon.jpeg',
     icon: Zap,
-    color: '#9B59B6',
+    color: '#60d5f0',
     size: 'large'
   },
 ];

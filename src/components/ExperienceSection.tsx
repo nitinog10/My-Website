@@ -79,10 +79,10 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
   };
 
   return (
-    <div className="min-w-[80vw] md:min-w-[45vw] lg:min-w-[35vw] flex items-center">
+    <div className="min-w-[70vw] md:min-w-[40vw] lg:min-w-[32vw] flex items-center">
       <motion.div
         ref={cardRef}
-        className="group relative w-full rounded-2xl p-6 md:p-8 mx-4 transition-all duration-300 ease-out overflow-hidden"
+        className="group relative w-full rounded-2xl p-4 md:p-5 mx-4 transition-all duration-300 ease-out overflow-hidden"
         style={{
           rotateX,
           rotateY,
@@ -259,39 +259,39 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
         {/* Content - relative z-index to stay above effects */}
         <div className="relative z-10">
           {/* Index number */}
-          <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+          <span className="text-accent text-[10px] font-medium tracking-wider mb-3 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
             0{index + 1}
           </span>
           
           {/* Period badge */}
-          <div className="flex items-center justify-between mb-6">
-            <span className="text-accent text-xs font-black tracking-[0.3em] uppercase py-1 px-3 border border-accent/20 rounded-full">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-accent text-[10px] font-black tracking-[0.3em] uppercase py-0.5 px-2.5 border border-accent/20 rounded-full">
               {exp.period}
             </span>
             <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
           </div>
 
           {/* Role */}
-          <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
             {exp.role}
           </h3>
           
           {/* Company */}
-          <p className="text-accent text-sm uppercase tracking-wider font-medium mb-6" style={{ transform: 'translateZ(15px)' }}>
+          <p className="text-accent text-[10px] uppercase tracking-wider font-medium mb-4" style={{ transform: 'translateZ(15px)' }}>
             @ {exp.company}
           </p>
 
           {/* Description */}
-          <p className="text-white/50 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
+          <p className="text-white/50 text-[11px] md:text-xs leading-relaxed mb-4" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
             {exp.description}
           </p>
           
           {/* Tags */}
-          <div className="flex flex-wrap gap-2" style={{ transform: 'translateZ(5px)' }}>
+          <div className="flex flex-wrap gap-1.5" style={{ transform: 'translateZ(5px)' }}>
             {exp.tags.map(tag => (
               <span 
                 key={tag} 
-                className="text-xs text-white/40 uppercase tracking-wider px-3 py-1.5 border border-white/10 rounded-full hover:border-accent/40 hover:text-accent/60 transition-all"
+                className="text-[9px] text-white/40 uppercase tracking-wider px-2 py-0.5 border border-white/10 rounded-full hover:border-accent/40 hover:text-accent/60 transition-all"
               >
                 {tag}
               </span>
@@ -347,7 +347,7 @@ const ExperienceSection = () => {
               animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
               transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
             >
-              <h2 className="text-[clamp(4rem,12vw,12rem)] font-bold text-white uppercase tracking-tighter leading-none mb-4 -ml-2">
+              <h2 className="text-[clamp(3rem,10vw,10rem)] font-bold text-white uppercase tracking-tighter leading-none mb-4 -ml-2">
                 CAREER<br />
                 <span className="text-white/10 outline-text">STORY</span>
               </h2>
