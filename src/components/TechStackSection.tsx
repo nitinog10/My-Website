@@ -175,54 +175,42 @@ const TechCard = ({ tech, index }: any) => {
           >
             <motion.div
               className="rounded-full p-2 relative"
-              animate={hovered ? {
-                boxShadow: [
-                  `0 0 0px ${tech.color}00`,
-                  `0 0 20px ${tech.color}80`,
-                  `0 0 40px ${tech.color}60`,
-                  `0 0 20px ${tech.color}80`,
-                  `0 0 0px ${tech.color}00`,
-                ],
-                transition: {
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }
-              } : {}}
             >
-              {/* Always visible subtle glow */}
-              <motion.div
-                className="absolute inset-0 rounded-full blur-lg pointer-events-none"
-                style={{
-                  backgroundColor: tech.color,
-                }}
-                animate={{
-                  opacity: hovered ? [0.3, 0.5, 0.3] : [0.1, 0.15, 0.1],
-                  scale: hovered ? [1, 1.2, 1] : [1, 1.05, 1],
-                }}
-                transition={{
-                  duration: hovered ? 1.5 : 3,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-              
-              {/* Border glow on hover */}
+              {/* Glow only on hover */}
               {hovered && (
-                <motion.div
-                  className="absolute inset-0 rounded-full border-2 pointer-events-none"
-                  style={{ borderColor: tech.color }}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{
-                    opacity: [0, 1, 0],
-                    scale: [0.9, 1.1, 1.3],
-                  }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    ease: "easeOut"
-                  }}
-                />
+                <>
+                  <motion.div
+                    className="absolute inset-0 rounded-full blur-lg pointer-events-none"
+                    style={{
+                      backgroundColor: tech.color,
+                    }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{
+                      opacity: [0, 0.5, 0.3],
+                      scale: [0.8, 1.2, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                  />
+                  
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 pointer-events-none"
+                    style={{ borderColor: tech.color }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{
+                      opacity: [0, 1, 0],
+                      scale: [0.9, 1.1, 1.3],
+                    }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "easeOut"
+                    }}
+                  />
+                </>
               )}
               
               <IconComponent
