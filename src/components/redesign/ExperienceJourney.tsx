@@ -1,17 +1,25 @@
-import { useRef, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import { motion, useScroll, useTransform, useInView, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Briefcase, Award, GraduationCap, Rocket } from 'lucide-react';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+import { Briefcase, Award, GraduationCap, Rocket, X, ExternalLink } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
 const experiences = [
   {
     year: '2025',
     role: 'CO-FOUNDER',
     company: 'BUGBICEPS.IN',
+    period: 'PRESENT',
     description: 'Building innovative tech solutions that simplify complex engineering concepts into high-impact digital products.',
+    achievements: [
+      'Founded tech startup focused on engineering education',
+      'Built scalable platform architecture',
+      'Led product vision and strategy'
+    ],
+    technologies: ['Next.js', 'AI/ML', 'Cloud Architecture'],
     icon: Rocket,
     color: '#FF6B6B',
     tags: ['Entrepreneurship', 'Product', 'Leadership'],
@@ -20,7 +28,14 @@ const experiences = [
     year: '2025',
     role: 'HEAD ALUMNI',
     company: 'OIST BHOPAL',
+    period: '2025 — 26',
     description: 'Leading student community initiatives, managing external relations and mentorship programs for technical excellence.',
+    achievements: [
+      'Managing 500+ alumni network',
+      'Organized 10+ technical workshops',
+      'Established industry partnerships'
+    ],
+    technologies: ['Community Building', 'Event Management', 'Public Speaking'],
     icon: Award,
     color: '#4ECDC4',
     tags: ['Community', 'Strategy', 'Mentorship'],
@@ -29,7 +44,14 @@ const experiences = [
     year: '2024',
     role: 'AI DEVELOPER',
     company: 'TECHBUS',
+    period: 'BANGALORE',
     description: 'Engineered high-accuracy NLP models for conversational AI and integrated them into CRM workflows.',
+    achievements: [
+      'Built NLP models with 95%+ accuracy',
+      'Integrated AI into CRM systems',
+      'Reduced response time by 60%'
+    ],
+    technologies: ['Python', 'NLP', 'TensorFlow', 'FastAPI'],
     icon: Briefcase,
     color: '#FFA502',
     tags: ['AI', 'NLP', 'Remote'],
@@ -38,7 +60,14 @@ const experiences = [
     year: '2024',
     role: 'INTERN',
     company: 'ENTOPLEARNING',
+    period: '2024',
     description: 'Built foundational LMS modules with focus on backend performance and scalable educational infrastructure.',
+    achievements: [
+      'Developed core LMS features',
+      'Optimized database queries',
+      'Implemented caching strategies'
+    ],
+    technologies: ['Python', 'Django', 'PostgreSQL', 'Redis'],
     icon: Briefcase,
     color: '#45B7D1',
     tags: ['Backend', 'LMS', 'Python'],
@@ -47,14 +76,21 @@ const experiences = [
     year: '2024',
     role: 'B.TECH (AIML)',
     company: 'ORIENTAL GROUP',
+    period: '2024 — PRESENT',
     description: 'Specializing in Artificial Intelligence and Machine Learning architecture, building next-gen AI systems.',
+    achievements: [
+      'Specialized in AI/ML engineering',
+      'Built multiple AI projects',
+      'Research in computer vision'
+    ],
+    technologies: ['PyTorch', 'TensorFlow', 'Computer Vision', 'Deep Learning'],
     icon: GraduationCap,
     color: '#95E1D3',
     tags: ['AIML', 'Engineering', 'Research'],
   },
 ];
 
-const ExperienceCard = ({ exp, index }: any) => {
+const ExperienceCard = ({ exp, index, onExpand }: any) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const IconComponent = exp.icon;
 
@@ -63,13 +99,14 @@ const ExperienceCard = ({ exp, index }: any) => {
 
     gsap.fromTo(
       cardRef.current,
-      { opacity: 0, y: 100, rotateY: -30 },
+      { opacity: 0, y: 100, rotateY: -30, scale: 0.8 },
       {
         opacity: 1,
         y: 0,
         rotateY: 0,
-        duration: 1,
-        ease: 'power3.out',
+        scale: 1,
+        duration: 1.2,
+        ease: 'back.out(1.4)',
         scrollTrigger: {
           trigger: cardRef.current,
           start: 'left 80%',
@@ -83,15 +120,16 @@ const ExperienceCard = ({ exp, index }: any) => {
   return (
     <motion.div
       ref={cardRef}
-      className="flex-shrink-0 w-[400px] h-[500px] relative group"
-      whileHover={{ scale: 1.05, z: 50 }}
+      className="flex-shrink-0 w-[450px] h-[600px] relative group cursor-pointer"
+      whileHover={{ scale: 1.03, z: 50 }}
       transition={{ duration: 0.3 }}
+      onClick={() => onExpand(exp)}
     >
       <div
         className="absolute inset-0 rounded-3xl p-8 flex flex-col justify-between overflow-hidden"
         style={{
-          background: `linear-gradient(135deg, ${exp.color}15 0%, rgba(0,0,0,0.8) 100%)`,
-          border: `1px solid ${exp.color}30`,
+          background: `linear-gradient(135deg, ${exp.color}15 0%, rgba(0,0,0,0.9) 100%)`,
+          border: `2px solid ${exp.color}30`,
         }}
       >
         {/* Background pattern */}
@@ -102,33 +140,52 @@ const ExperienceCard = ({ exp, index }: any) => {
           }} />
         </div>
 
+        {/* Animated gradient orb */}
+        <motion.div
+          className="absolute -top-20 -right-20 w-60 h-60 rounded-full opacity-20 blur-3xl"
+          style={{ backgroundColor: exp.color }}
+          animate={{ 
+            scale: [1, 1.2, 1],
+            rotate: [0, 90, 0]
+          }}
+          transition={{ duration: 8, repeat: Infinity }}
+        />
+
         {/* Content */}
         <div className="relative z-10">
           {/* Icon */}
           <motion.div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6"
-            style={{ backgroundColor: `${exp.color}20`, border: `2px solid ${exp.color}` }}
-            whileHover={{ rotate: 360 }}
+            className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
+            style={{ 
+              backgroundColor: `${exp.color}20`, 
+              border: `2px solid ${exp.color}`,
+              boxShadow: `0 0 30px ${exp.color}40`
+            }}
+            whileHover={{ rotate: 360, scale: 1.1 }}
             transition={{ duration: 0.6 }}
           >
-            <IconComponent className="w-8 h-8" style={{ color: exp.color }} />
+            <IconComponent className="w-10 h-10" style={{ color: exp.color }} />
           </motion.div>
 
           {/* Year badge */}
           <motion.div
             className="inline-block px-4 py-2 rounded-full mb-4"
-            style={{ backgroundColor: `${exp.color}30`, border: `1px solid ${exp.color}` }}
+            style={{ 
+              backgroundColor: `${exp.color}30`, 
+              border: `1px solid ${exp.color}`,
+              boxShadow: `0 0 20px ${exp.color}30`
+            }}
           >
             <span className="text-sm font-bold uppercase tracking-wider" style={{ color: exp.color }}>
-              {exp.year}
+              {exp.period}
             </span>
           </motion.div>
 
           {/* Role & Company */}
-          <h3 className="text-3xl font-black uppercase tracking-tight text-white mb-2">
+          <h3 className="text-3xl font-black uppercase tracking-tight text-white mb-2 leading-tight">
             {exp.role}
           </h3>
-          <p className="text-lg font-semibold mb-4" style={{ color: exp.color }}>
+          <p className="text-xl font-semibold mb-6" style={{ color: exp.color }}>
             @ {exp.company}
           </p>
 
@@ -137,12 +194,34 @@ const ExperienceCard = ({ exp, index }: any) => {
             {exp.description}
           </p>
 
+          {/* Technologies */}
+          <div className="mb-6">
+            <p className="text-xs font-bold uppercase tracking-wider text-white/50 mb-2">
+              Technologies
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {exp.technologies.slice(0, 3).map((tech: string) => (
+                <span
+                  key={tech}
+                  className="text-xs px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-white/80"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {exp.tags.map((tag: string) => (
               <span
                 key={tag}
-                className="text-xs px-3 py-1 rounded-lg bg-white/10 border border-white/20 text-white/80"
+                className="text-xs px-3 py-1 rounded-lg font-semibold"
+                style={{
+                  backgroundColor: `${exp.color}20`,
+                  border: `1px solid ${exp.color}40`,
+                  color: exp.color
+                }}
               >
                 {tag}
               </span>
@@ -150,13 +229,15 @@ const ExperienceCard = ({ exp, index }: any) => {
           </div>
         </div>
 
-        {/* Decorative element */}
+        {/* Click to expand hint */}
         <motion.div
-          className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full opacity-20"
-          style={{ backgroundColor: exp.color, filter: 'blur(40px)' }}
-          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
-          transition={{ duration: 4, repeat: Infinity }}
-        />
+          className="relative z-10 flex items-center gap-2 text-sm font-bold uppercase tracking-wider"
+          style={{ color: exp.color }}
+          initial={{ opacity: 0 }}
+          whileHover={{ opacity: 1, x: 5 }}
+        >
+          Click to expand <ExternalLink className="w-4 h-4" />
+        </motion.div>
       </div>
     </motion.div>
   );
