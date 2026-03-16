@@ -83,10 +83,10 @@ const TechOrbit = ({ techs, radius, speed, tilt, onHover }: any) => {
 
   return (
     <group ref={groupRef} rotation={[tilt, 0, 0]}>
-      {/* Orbit ring */}
+      {/* Orbit ring - simplified */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[radius, 0.015, 16, 100]} />
-        <meshBasicMaterial color="#00ffc8" transparent opacity={0.2} />
+        <torusGeometry args={[radius, 0.01, 8, 50]} />
+        <meshBasicMaterial color="#00ffc8" transparent opacity={0.15} />
       </mesh>
 
       {techs.map((tech: any, i: number) => {
@@ -125,7 +125,7 @@ const SkillNeuralNetwork = () => {
 
   return (
     <div className="relative w-full h-[700px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
-      <Canvas>
+      <Canvas gl={{ antialias: false, powerPreference: "high-performance" }} dpr={[1, 1.5]}>
         <PerspectiveCamera makeDefault position={[0, 3, 8]} fov={70} />
         <OrbitControls 
           enableZoom={true}
@@ -135,13 +135,12 @@ const SkillNeuralNetwork = () => {
           enablePan={false}
           maxPolarAngle={Math.PI / 1.6}
           minPolarAngle={Math.PI / 4}
+          enableDamping={false}
         />
         
-        <ambientLight intensity={1} />
-        <pointLight position={[10, 10, 10]} intensity={3} color="#00ffc8" />
-        <pointLight position={[-10, -10, -10]} intensity={2.5} color="#ff6b6b" />
-        <pointLight position={[0, 0, 10]} intensity={2.5} color="#4ECDC4" />
-        <directionalLight position={[0, 10, 5]} intensity={2} color="#ffffff" />
+        <ambientLight intensity={0.8} />
+        <pointLight position={[10, 10, 10]} intensity={2} color="#00ffc8" />
+        <pointLight position={[-10, -10, -10]} intensity={1.5} color="#ff6b6b" />
         
         {orbits.map((orbit, i) => (
           <TechOrbit
@@ -154,15 +153,13 @@ const SkillNeuralNetwork = () => {
           />
         ))}
         
-        {/* Central core */}
+        {/* Central core - simplified */}
         <mesh>
-          <sphereGeometry args={[0.8, 32, 32]} />
-          <meshStandardMaterial
+          <sphereGeometry args={[0.8, 16, 16]} />
+          <meshBasicMaterial
             color="#00ffc8"
-            emissive="#00ffc8"
-            emissiveIntensity={1.2}
             transparent
-            opacity={0.5}
+            opacity={0.3}
           />
         </mesh>
       </Canvas>
