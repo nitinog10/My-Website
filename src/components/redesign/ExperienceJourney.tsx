@@ -402,78 +402,233 @@ const ExperienceJourney = () => {
     const ctx = gsap.context(() => {
       const scrollWidth = scrollRef.current!.scrollWidth;
       const windowWidth = window.innerWidth;
+      const scrollDistance = scrollWidth - windowWidth;
 
+      // Horizontal scroll animation
       gsap.to(scrollRef.current, {
-        x: -(scrollWidth - windowWidth),
+        x: -scrollDistance,
         ease: 'none',
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: () => `+=${scrollWidth}`,
+          end: () => `+=${scrollDistance + windowWidth}`,
           pin: true,
-          scrub: 1,
+          scrub: 1.5,
           invalidateOnRefresh: true,
         },
       });
+
+      // Animate SVG path drawing
+      if (pathRef.current) {
+        const pathLength = pathRef.current.getTotalLength();
+        
+        gsap.fromTo(
+          pathRef.current,
+          { strokeDashoffset: pathLength },
+          {
+            strokeDashoffset: 0,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top top',
+              end: () => `+=${scrollDistance + windowWidth}`,
+              scrub: 1.5,
+            },
+          }
+        );
+      }
     });
 
     return () => ctx.revert();
   }, []);
 
+  // Generate SVG path for timeline
+  const generatePath = () => {
+    const points = experiences.map((_, i) => {
+      const x = 400 + i * 550;
+      const y = 250 + Math.sin(i * 0.8) * 80;
+      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    });
+    return points.join(' ');
+  };
+
   return (
-    <section ref={containerRef} className="relative h-[200vh] bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+    <>
+      <section ref={containerRef} className="relative h-[250vh] bg-black">
+        <div className="sticky top-0 h-screen overflow-hidden">
+          {/* Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black" />
+          
+          {/* Animated grid */}
+          <div className="absolute inset-0 opacity-10">
+            <div 
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'linear-gradient(rgba(0,255,200,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,200,0.1) 1px, transparent 1px)',
+                backgroundSize: '50px 50px'
+              }}
+            />
+          </div>
 
-        {/* Title - Fixed on left */}
-        <div className="absolute left-12 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+          {/* Title - Fixed on left */}
+          <div className="absolute left-12 top-1/2 -translate-y-1/2 z-20 pointer-events-none max-w-md">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1 }}
+            >
+              <motion.span 
+                className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block"
+                initial={{ opacity: 0 }}
+                animate={isInView ? { opacity: 1 } : { opacity: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                003 — EXPERIENCE
+              </motion.span>
+              <h2 className="text-[clamp(3rem, 8vw, 6rem)] font-black uppercase tracking-tighter leading-[0.85] text-white mb-6">
+                MY<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
+                  JOURNEY
+                </span>
+              </h2>
+              <p className="text-sm text-white/60 leading-relaxed mb-6">
+                A horizontal timeline of my professional evolution, from student innovator to AI engineer.
+              </p>
+              <div className="flex items-center gap-4">
+                <div className="h-px w-16 bg-accent" />
+                <span className="text-sm text-white/60 uppercase tracking-wider">Scroll to explore</span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Horizontal scroll container */}
+          <div className="absolute inset-0 flex items-center overflow-hidden">
+            {/* SVG Path */}
+            <svg 
+              className="absolute inset-0 w-full h-full pointer-events-none z-0"
+              style={{ minWidth: `${experiences.length * 550 + 800}px` }}
+            >
+              <defs>
+                <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#00ffc8" stopOpacity="0.3" />
+                  <stop offset="50%" stopColor="#00ffc8" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#00ffc8" stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              <motion.path
+                ref={pathRef}
+                d={generatePath()}
+                stroke="url(#pathGradient)"
+                strokeWidth="3"
+                fill="none"
+                strokeDasharray={pathRef.current?.getTotalLength() || 0}
+                strokeDashoffset={pathRef.current?.getTotalLength() || 0}
+                strokeLinecap="round"
+              />
+              
+              {/* Milestone dots */}
+              {experiences.map((exp, i) => {
+                const x = 400 + i * 550;
+                const y = 250 + Math.sin(i * 0.8) * 80;
+                return (
+                  <g key={i}>
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="12"
+                      fill={exp.color}
+                      opacity="0.3"
+                    />
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r="6"
+                      fill={exp.color}
+                      style={{ filter: `drop-shadow(0 0 10px ${exp.color})` }}
+                    />
+                  </g>
+                );
+              })}
+            </svg>
+
+            <motion.div
+              ref={scrollRef}
+              className="flex gap-16 px-[50vw] py-20 items-center"
+            >
+              {/* Intro card */}
+              <div className="min-w-[40vw] flex flex-col justify-center">
+                <motion.div
+                  initial={{ opacity: 0, x: -100 }}
+                  animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -100 }}
+                  transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className="bg-gradient-to-br from-accent/10 to-transparent p-8 rounded-3xl border border-accent/20">
+                    <h3 className="text-3xl font-black uppercase text-white mb-4">
+                      Career Timeline
+                    </h3>
+                    <p className="text-white/70 leading-relaxed mb-6">
+                      Follow the path through my professional milestones, from education to entrepreneurship.
+                      Each stop represents growth, learning, and impact.
+                    </p>
+                    <div className="flex items-center gap-3 text-accent text-sm font-bold uppercase tracking-wider">
+                      <div className="w-12 h-px bg-accent" />
+                      {experiences.length} Milestones
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+
+              {/* Experience cards */}
+              {experiences.map((exp, i) => (
+                <ExperienceCard key={i} exp={exp} index={i} onExpand={setSelectedExp} />
+              ))}
+              
+              {/* End spacer */}
+              <div className="w-[40vw] flex-shrink-0 flex items-center justify-center">
+                <motion.div
+                  className="text-center"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                >
+                  <div className="w-20 h-20 rounded-full bg-accent/20 border-2 border-accent flex items-center justify-center mb-4 mx-auto">
+                    <div className="w-10 h-10 rounded-full bg-accent" />
+                  </div>
+                  <p className="text-white/60 text-sm uppercase tracking-wider">
+                    Journey Continues...
+                  </p>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 h-2 bg-white/10 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-accent to-blue-500"
+              style={{ scaleX: pathLength, transformOrigin: 'left' }}
+            />
+          </div>
+
+          {/* Scroll indicator */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1 }}
+            className="absolute bottom-12 right-12 text-right"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity }}
           >
-            <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block">
-              003 — EXPERIENCE
-            </span>
-            <h2 className="text-[clamp(3rem, 8vw, 6rem)] font-black uppercase tracking-tighter leading-[0.85] text-white">
-              MY<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
-                JOURNEY
-              </span>
-            </h2>
-            <div className="flex items-center gap-4 mt-8">
-              <div className="h-px w-16 bg-accent" />
-              <span className="text-sm text-white/60 uppercase tracking-wider">Scroll horizontally</span>
-            </div>
+            <p className="text-xs text-white/50 uppercase tracking-wider">
+              Scroll horizontally
+            </p>
           </motion.div>
         </div>
+      </section>
 
-        {/* Horizontal scroll container */}
-        <div className="absolute inset-0 flex items-center">
-          <motion.div
-            ref={scrollRef}
-            className="flex gap-12 px-[50vw] py-20"
-            style={{ x }}
-          >
-            {experiences.map((exp, i) => (
-              <ExperienceCard key={i} exp={exp} index={i} />
-            ))}
-            
-            {/* End spacer */}
-            <div className="w-[40vw] flex-shrink-0" />
-          </motion.div>
-        </div>
-
-        {/* Progress bar */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-64 h-1 bg-white/10 rounded-full overflow-hidden">
-          <motion.div
-            className="h-full bg-accent"
-            style={{ scaleX: scrollYProgress, transformOrigin: 'left' }}
-          />
-        </div>
-      </div>
-    </section>
+      {/* Experience detail modal */}
+      <AnimatePresence>
+        {selectedExp && (
+          <ExperienceDetail exp={selectedExp} onClose={() => setSelectedExp(null)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 
