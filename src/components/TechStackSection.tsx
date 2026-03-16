@@ -45,10 +45,8 @@ const TechNode = ({ tech, position, index, onHover }: any) => {
 
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    // Smooth floating animation
+    // Smooth floating animation only
     groupRef.current.position.y = position[1] + Math.sin(time * 0.5 + index) * 0.3;
-    // Gentle rotation
-    groupRef.current.rotation.y += 0.005;
   });
 
   return (
