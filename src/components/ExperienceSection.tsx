@@ -54,6 +54,7 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const [hovered, setHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -72,6 +73,7 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
+    setHovered(false);
   };
 
   return (
@@ -88,53 +90,126 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
           boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
         }}
         onMouseMove={handleMouseMove}
+        onMouseEnter={() => setHovered(true)}
         onMouseLeave={handleMouseLeave}
         whileHover={{
           boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
           border: '1px solid rgba(255,255,255,0.12)'
         }}
       >
+        {/* Split effect - top half */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0,255,200,0.1), transparent)',
+            clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)',
+          }}
+          animate={hovered ? {
+            y: -8,
+            opacity: [0, 1, 0.7],
+          } : {
+            y: 0,
+            opacity: 0,
+          }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        />
+        
+        {/* Split effect - bottom half */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(135deg, transparent, rgba(0,255,200,0.1))',
+            clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)',
+          }}
+          animate={hovered ? {
+            y: 8,
+            opacity: [0, 1, 0.7],
+          } : {
+            y: 0,
+            opacity: 0,
+          }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        />
+
+        {/* Pointing particles */}
+        {hovered && (
+          <>
+            {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+              <motion.div
+                key={angle}
+                className="absolute w-1.5 h-1.5 rounded-full pointer-events-none z-50"
+                style={{
+                  backgroundColor: '#00ffc8',
+                  left: '50%',
+                  top: '50%',
+                  boxShadow: '0 0 10px #00ffc8',
+                }}
+                initial={{ 
+                  x: '-50%', 
+                  y: '-50%',
+                  scale: 0,
+                  opacity: 0
+                }}
+                animate={{
+                  x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 50}px)`,
+                  y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 50}px)`,
+                  scale: [0, 1, 0],
+                  opacity: [0, 1, 0],
+                }}
+                transition={{
+                  duration: 1,
+                  ease: "easeOut",
+                  delay: i * 0.08
+                }}
+              />
+            ))}
+          </>
+        )}
+
         {/* Top accent border */}
         <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
         
-        {/* Index number */}
-        <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-          0{index + 1}
-        </span>
-        
-        {/* Period badge */}
-        <div className="flex items-center justify-between mb-6">
-          <span className="text-accent text-xs font-black tracking-[0.3em] uppercase py-1 px-3 border border-accent/20 rounded-full">
-            {exp.period}
+        {/* Content - relative z-index to stay above effects */}
+        <div className="relative z-10">
+          {/* Index number */}
+          <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            0{index + 1}
           </span>
-          <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-        </div>
-
-        {/* Role */}
-        <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
-          {exp.role}
-        </h3>
-        
-        {/* Company */}
-        <p className="text-accent text-sm uppercase tracking-wider font-medium mb-6" style={{ transform: 'translateZ(15px)' }}>
-          @ {exp.company}
-        </p>
-
-        {/* Description */}
-        <p className="text-white/50 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
-          {exp.description}
-        </p>
-        
-        {/* Tags */}
-        <div className="flex flex-wrap gap-2" style={{ transform: 'translateZ(5px)' }}>
-          {exp.tags.map(tag => (
-            <span 
-              key={tag} 
-              className="text-xs text-white/40 uppercase tracking-wider px-3 py-1.5 border border-white/10 rounded-full hover:border-accent/40 hover:text-accent/60 transition-all"
-            >
-              {tag}
+          
+          {/* Period badge */}
+          <div className="flex items-center justify-between mb-6">
+            <span className="text-accent text-xs font-black tracking-[0.3em] uppercase py-1 px-3 border border-accent/20 rounded-full">
+              {exp.period}
             </span>
-          ))}
+            <div className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+          </div>
+
+          {/* Role */}
+          <h3 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+            {exp.role}
+          </h3>
+          
+          {/* Company */}
+          <p className="text-accent text-sm uppercase tracking-wider font-medium mb-6" style={{ transform: 'translateZ(15px)' }}>
+            @ {exp.company}
+          </p>
+
+          {/* Description */}
+          <p className="text-white/50 text-sm leading-relaxed mb-6" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(10px)' }}>
+            {exp.description}
+          </p>
+          
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2" style={{ transform: 'translateZ(5px)' }}>
+            {exp.tags.map(tag => (
+              <span 
+                key={tag} 
+                className="text-xs text-white/40 uppercase tracking-wider px-3 py-1.5 border border-white/10 rounded-full hover:border-accent/40 hover:text-accent/60 transition-all"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Bottom progress line */}

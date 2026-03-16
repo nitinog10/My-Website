@@ -37,6 +37,7 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
+  const [hovered, setHovered] = useState(false);
   const isLeft = index % 2 === 0;
   
   const { scrollYProgress } = useScroll({
@@ -61,6 +62,7 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
   const handleMouseLeave = () => {
     setRotateX(0);
     setRotateY(0);
+    setHovered(false);
   };
 
   return (
@@ -79,6 +81,7 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
           className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
           style={{ opacity, x, scale }}
           onMouseMove={handleMouseMove}
+          onMouseEnter={() => setHovered(true)}
           onMouseLeave={handleMouseLeave}
         >
           {/* Connector line */}
@@ -107,6 +110,75 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
               border: '1px solid rgba(255,255,255,0.12)'
             }}
           >
+            {/* Split effect - top half */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none z-20"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,255,200,0.15), transparent)',
+                clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)',
+              }}
+              animate={hovered ? {
+                y: -10,
+                opacity: [0, 1, 0.8],
+              } : {
+                y: 0,
+                opacity: 0,
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+            
+            {/* Split effect - bottom half */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none z-20"
+              style={{
+                background: 'linear-gradient(135deg, transparent, rgba(0,255,200,0.15))',
+                clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)',
+              }}
+              animate={hovered ? {
+                y: 10,
+                opacity: [0, 1, 0.8],
+              } : {
+                y: 0,
+                opacity: 0,
+              }}
+              transition={{ duration: 0.4, ease: "easeOut" }}
+            />
+
+            {/* Pointing particles */}
+            {hovered && (
+              <>
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                  <motion.div
+                    key={angle}
+                    className="absolute w-1.5 h-1.5 rounded-full pointer-events-none z-50"
+                    style={{
+                      backgroundColor: '#00ffc8',
+                      left: '50%',
+                      top: '50%',
+                      boxShadow: '0 0 10px #00ffc8',
+                    }}
+                    initial={{ 
+                      x: '-50%', 
+                      y: '-50%',
+                      scale: 0,
+                      opacity: 0
+                    }}
+                    animate={{
+                      x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 60}px)`,
+                      y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 60}px)`,
+                      scale: [0, 1, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1.2,
+                      ease: "easeOut",
+                      delay: i * 0.06
+                    }}
+                  />
+                ))}
+              </>
+            )}
+
             {/* Top accent border */}
             <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent z-10" />
             
@@ -122,7 +194,7 @@ const RecognitionCard = ({ item, index }: { item: typeof recognitions[0]; index:
             </div>
 
             {/* Content */}
-            <div className="p-5 md:p-6">
+            <div className="p-5 md:p-6 relative z-10">
               {/* Category & Year */}
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-accent text-xs font-medium tracking-wider" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
