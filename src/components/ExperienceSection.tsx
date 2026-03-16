@@ -55,6 +55,7 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
   const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;
@@ -68,6 +69,7 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
     
     setRotateX(-mouseY / 20);
     setRotateY(mouseX / 20);
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
   };
 
   const handleMouseLeave = () => {
@@ -97,6 +99,28 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
           border: '1px solid rgba(255,255,255,0.12)'
         }}
       >
+        {/* Magnetic spotlight effect following cursor */}
+        {hovered && (
+          <motion.div
+            className="absolute rounded-full pointer-events-none blur-3xl"
+            style={{
+              width: '300px',
+              height: '300px',
+              background: 'radial-gradient(circle, rgba(0,255,200,0.15), transparent 70%)',
+              left: mousePos.x - 150,
+              top: mousePos.y - 150,
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+        )}
+
         {/* Split effect - top half */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
@@ -163,6 +187,69 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0]; index: num
                 }}
               />
             ))}
+          </>
+        )}
+
+        {/* Animated corner accents */}
+        {hovered && (
+          <>
+            <motion.div
+              className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-accent rounded-tl-2xl pointer-events-none"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "backOut" }}
+            />
+            <motion.div
+              className="absolute top-0 right-0 w-12 h-12 border-r-2 border-t-2 border-accent rounded-tr-2xl pointer-events-none"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1, ease: "backOut" }}
+            />
+            <motion.div
+              className="absolute bottom-0 left-0 w-12 h-12 border-l-2 border-b-2 border-accent rounded-bl-2xl pointer-events-none"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.2, ease: "backOut" }}
+            />
+            <motion.div
+              className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-accent rounded-br-2xl pointer-events-none"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3, ease: "backOut" }}
+            />
+          </>
+        )}
+
+        {/* Ripple waves */}
+        {hovered && (
+          <>
+            <motion.div
+              className="absolute inset-0 border-2 border-accent/30 rounded-2xl pointer-events-none"
+              initial={{ scale: 1, opacity: 0.6 }}
+              animate={{
+                scale: [1, 1.05, 1.1],
+                opacity: [0.6, 0.3, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeOut"
+              }}
+            />
+            <motion.div
+              className="absolute inset-0 border-2 border-accent/30 rounded-2xl pointer-events-none"
+              initial={{ scale: 1, opacity: 0.6 }}
+              animate={{
+                scale: [1, 1.05, 1.1],
+                opacity: [0.6, 0.3, 0],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeOut",
+                delay: 0.5
+              }}
+            />
           </>
         )}
 
