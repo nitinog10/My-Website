@@ -369,32 +369,6 @@ const TechStackSection = () => {
             <TechCard key={tech.name} tech={tech} index={index} />
           ))}
         </div>
-
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
-        >
-          <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">23+</div>
-            <div className="text-xs text-white/40 uppercase tracking-widest">Technologies</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">8+</div>
-            <div className="text-xs text-white/40 uppercase tracking-widest">Categories</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">5+</div>
-            <div className="text-xs text-white/40 uppercase tracking-widest">AI Frameworks</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl md:text-5xl font-bold text-accent mb-2">100%</div>
-            <div className="text-xs text-white/40 uppercase tracking-widest">Production Ready</div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

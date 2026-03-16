@@ -20,11 +20,10 @@ const skillGroups = [
   }
 ];
 
-// 3D Card component with parallax hover and timeline layout
+// Card component with better animations
 const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
+  const [hovered, setHovered] = useState(false);
   const isLeft = index % 2 === 0;
   
   const { scrollYProgress } = useScroll({
@@ -37,25 +36,6 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
   const x = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [xOffset, 0, 0, -xOffset]);
   const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.9, 1, 1, 0.9]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const card = cardRef.current;
-    if (!card) return;
-    
-    const rect = card.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const mouseX = e.clientX - centerX;
-    const mouseY = e.clientY - centerY;
-    
-    setRotateX(-mouseY / 20);
-    setRotateY(mouseX / 20);
-  };
-
-  const handleMouseLeave = () => {
-    setRotateX(0);
-    setRotateY(0);
-  };
-
   return (
     <div ref={cardRef} className="relative">
       {/* Timeline point */}
@@ -63,7 +43,21 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
         className="absolute left-1/2 top-6 -translate-x-1/2 z-10 hidden md:flex items-center justify-center"
         style={{ opacity }}
       >
-        <div className="w-3 h-3 rounded-full bg-accent shadow-[0_0_15px_rgba(0,255,200,0.6)]" />
+        <motion.div 
+          className="w-3 h-3 rounded-full bg-accent"
+          animate={{
+            boxShadow: [
+              '0 0 15px rgba(0,255,200,0.6)',
+              '0 0 25px rgba(0,255,200,0.8)',
+              '0 0 15px rgba(0,255,200,0.6)',
+            ]
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
       </motion.div>
 
       {/* Card container - alternating sides */}
@@ -71,58 +65,198 @@ const SkillCard = ({ group, index }: { group: typeof skillGroups[0]; index: numb
         <motion.div
           className={`relative w-full md:w-[44%] ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}
           style={{ opacity, x, scale }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={() => setHovered(true)}
+          onMouseLeave={() => setHovered(false)}
         >
           {/* Connector line */}
-          <div
+          <motion.div
             className={`absolute top-8 ${isLeft ? 'right-0' : 'left-0'} w-12 h-px hidden md:block`}
             style={{
               background: isLeft 
                 ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.3))' 
                 : 'linear-gradient(to left, transparent, rgba(0,255,200,0.3))'
             }}
+            animate={hovered ? {
+              background: isLeft
+                ? 'linear-gradient(to right, transparent, rgba(0,255,200,0.6))'
+                : 'linear-gradient(to left, transparent, rgba(0,255,200,0.6))'
+            } : {}}
           />
 
           {/* Card */}
           <motion.div
-            className="group relative rounded-2xl p-5 md:p-6 transition-all duration-300 ease-out overflow-hidden"
+            className="group relative rounded-2xl p-5 md:p-6 overflow-hidden"
             style={{
-              rotateX,
-              rotateY,
-              transformStyle: 'preserve-3d',
               background: 'rgba(17, 17, 20, 0.9)',
               border: '1px solid rgba(255,255,255,0.08)',
-              boxShadow: '0 4px 24px rgba(0,0,0,0.4)'
             }}
             whileHover={{
-              boxShadow: '0 8px 40px rgba(0,0,0,0.5)',
-              border: '1px solid rgba(255,255,255,0.12)'
+              scale: 1.03,
+              border: '1px solid rgba(0,255,200,0.3)',
+              boxShadow: '0 8px 40px rgba(0,255,200,0.15)',
+              transition: {
+                duration: 0.3,
+                ease: [0.16, 1, 0.3, 1]
+              }
             }}
           >
+            {/* Animated gradient border */}
+            {hovered && (
+              <motion.div
+                className="absolute inset-0 opacity-50 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,255,200,0.2), transparent, rgba(0,255,200,0.2))',
+                }}
+                animate={{
+                  backgroundPosition: ['0% 0%', '100% 100%'],
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "linear"
+                }}
+              />
+            )}
+
             {/* Top accent border */}
-            <div className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent" />
+            <motion.div 
+              className="absolute top-0 left-4 right-4 h-[2px] rounded-full bg-gradient-to-r from-transparent via-accent to-transparent"
+              animate={hovered ? {
+                opacity: [0.5, 1, 0.5],
+              } : {
+                opacity: 0.5
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
             
             {/* Index number */}
-            <span className="text-accent text-xs font-medium tracking-wider mb-4 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <motion.span 
+              className="text-accent text-xs font-medium tracking-wider mb-4 block" 
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+              animate={hovered ? {
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, 0],
+              } : {
+                scale: 1,
+                rotate: 0,
+              }}
+              transition={{
+                duration: 0.5,
+                ease: "easeOut"
+              }}
+            >
               0{index + 1}
-            </span>
+            </motion.span>
             
             {/* Category header */}
-            <h3 className="text-lg md:text-xl font-bold text-white mb-3 tracking-tight" style={{ fontFamily: 'Inter, system-ui, sans-serif', transform: 'translateZ(20px)' }}>
+            <motion.h3 
+              className="text-lg md:text-xl font-bold text-white mb-3 tracking-tight" 
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+              animate={hovered ? {
+                x: 5,
+                color: '#00ffc8',
+              } : {
+                x: 0,
+                color: '#ffffff',
+              }}
+              transition={{
+                duration: 0.3,
+                ease: "easeOut"
+              }}
+            >
               {group.category.split(' ').map(word => word.charAt(0) + word.slice(1).toLowerCase()).join(' ')}
-            </h3>
+            </motion.h3>
 
             {/* Skills list */}
-            <div className="space-y-2" style={{ transform: 'translateZ(10px)' }}>
-              {group.skills.map((skill) => (
-                <div key={skill} className="group/skill">
-                  <span className="text-sm text-white/50 group-hover/skill:text-white/80 transition-colors duration-300 leading-relaxed block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <div className="space-y-2">
+              {group.skills.map((skill, i) => (
+                <motion.div 
+                  key={skill} 
+                  className="group/skill"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{
+                    delay: i * 0.05,
+                    duration: 0.4,
+                    ease: [0.16, 1, 0.3, 1]
+                  }}
+                >
+                  <motion.span 
+                    className="text-sm text-white/50 transition-colors duration-300 leading-relaxed block cursor-default" 
+                    style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+                    whileHover={{
+                      color: '#60d5f0',
+                      x: 3,
+                      textShadow: '0 0 8px rgba(96, 213, 240, 0.5)',
+                      transition: {
+                        duration: 0.2
+                      }
+                    }}
+                  >
                     {skill}
-                  </span>
-                </div>
+                  </motion.span>
+                </motion.div>
               ))}
             </div>
+
+            {/* Corner brackets on hover */}
+            {hovered && (
+              <>
+                <motion.div
+                  className="absolute top-2 left-2 w-8 h-8 border-t-2 border-l-2 border-accent rounded-tl-lg"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "backOut" }}
+                />
+                <motion.div
+                  className="absolute bottom-2 right-2 w-8 h-8 border-b-2 border-r-2 border-accent rounded-br-lg"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "backOut", delay: 0.1 }}
+                />
+              </>
+            )}
+
+            {/* Particle burst on hover */}
+            {hovered && (
+              <>
+                {[0, 90, 180, 270].map((angle, i) => (
+                  <motion.div
+                    key={angle}
+                    className="absolute w-1.5 h-1.5 rounded-full pointer-events-none"
+                    style={{
+                      backgroundColor: '#00ffc8',
+                      left: '50%',
+                      top: '50%',
+                      boxShadow: '0 0 10px #00ffc8',
+                    }}
+                    initial={{ 
+                      x: '-50%', 
+                      y: '-50%',
+                      scale: 0,
+                      opacity: 0
+                    }}
+                    animate={{
+                      x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 60}px)`,
+                      y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 60}px)`,
+                      scale: [0, 1, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1,
+                      ease: "easeOut",
+                      delay: i * 0.05,
+                      repeat: Infinity,
+                      repeatDelay: 0.5
+                    }}
+                  />
+                ))}
+              </>
+            )}
           </motion.div>
         </motion.div>
       </div>
