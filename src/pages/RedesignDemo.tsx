@@ -6,6 +6,7 @@ import ScrollProgress from '@/components/ScrollProgress';
 import TechEcosystem from '@/components/redesign/TechEcosystem';
 import ExperienceJourney from '@/components/redesign/ExperienceJourney';
 import ProjectsShowcase from '@/components/redesign/ProjectsShowcase';
+import DesignToggle from '@/components/DesignToggle';
 import { motion } from 'framer-motion';
 
 const RedesignDemo = () => {
@@ -118,6 +119,8 @@ const RedesignDemo = () => {
           </motion.div>
         </div>
       </section>
+      
+      <DesignToggle />
     </main>
   );
 };

@@ -12,6 +12,7 @@ import ExperienceSection from '@/components/ExperienceSection';
 import TechStackSection from '@/components/TechStackSection';
 import RecognitionSection from '@/components/RecognitionSection';
 import ContactSection from '@/components/ContactSection';
+import DesignToggle from '@/components/DesignToggle';
 
 const Index = () => {
   useLenis();
@@ -60,6 +61,8 @@ const Index = () => {
         <TechStackSection />
         <ContactSection />
       </div>
+      
+      <DesignToggle />
     </main>
   );
 };
