@@ -134,10 +134,10 @@ const SkillNeuralNetwork = () => {
   const [activeTech, setActiveTech] = useState<any>(null);
   const techPositions = useMemo(() => {
     return technologies.map((_, i) => {
-      // Better spherical distribution
+      // Better spherical distribution with more spacing
       const phi = Math.acos(-1 + (2 * i) / technologies.length);
       const theta = Math.sqrt(technologies.length * Math.PI) * phi;
-      const radius = 6; // Increased radius for better spacing
+      const radius = 7.5; // Even more spacing
       return [
         radius * Math.cos(theta) * Math.sin(phi),
         radius * Math.sin(theta) * Math.sin(phi),
@@ -148,20 +148,20 @@ const SkillNeuralNetwork = () => {
 
   return (
     <div className="relative w-full h-[600px] bg-black/40 rounded-3xl overflow-hidden border border-white/5 cursor-move">
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
-        <PerspectiveCamera makeDefault position={[0, 0, 18]} fov={45} />
+      <Canvas camera={{ position: [0, 0, 20], fov: 50 }}>
+        <PerspectiveCamera makeDefault position={[0, 0, 20]} fov={50} />
         <OrbitControls 
           enableZoom={true} 
           autoRotate 
-          autoRotateSpeed={0.2}
-          minDistance={12}
-          maxDistance={25}
+          autoRotateSpeed={0.15}
+          minDistance={15}
+          maxDistance={30}
           enablePan={false}
         />
-        <ambientLight intensity={0.3} />
-        <pointLight position={[10, 10, 10]} intensity={1.5} color="#00ffc8" />
-        <pointLight position={[-10, -10, -10]} intensity={0.8} color="#ff6b6b" />
-        <pointLight position={[0, 0, 10]} intensity={1} color="#4ECDC4" />
+        <ambientLight intensity={0.4} />
+        <pointLight position={[15, 15, 15]} intensity={2} color="#00ffc8" />
+        <pointLight position={[-15, -15, -15]} intensity={1.2} color="#ff6b6b" />
+        <pointLight position={[0, 0, 15]} intensity={1.5} color="#4ECDC4" />
         
         {technologies.map((tech, i) => (
           <TechNode 
@@ -192,13 +192,13 @@ const SkillNeuralNetwork = () => {
         })}
         
         {/* Central core */}
-        <Sphere args={[0.8, 32, 32]} position={[0, 0, 0]}>
+        <Sphere args={[1, 32, 32]} position={[0, 0, 0]}>
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
-            emissiveIntensity={0.3}
+            emissiveIntensity={0.4}
             transparent
-            opacity={0.1}
+            opacity={0.15}
             wireframe
           />
         </Sphere>
