@@ -51,7 +51,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
       {/* Icon only - no sphere */}
       <Html
         center
-        distanceFactor={0.05}
+        distanceFactor={0.03}
         position={[0, 0, 0]}
         style={{
           transition: 'all 0.3s ease',
@@ -61,7 +61,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
         <IconComponent 
           style={{ 
             color: hovered ? tech.color : '#ffffff', 
-            fontSize: hovered ? '5500px' : '5000px',
+            fontSize: hovered ? '8500px' : '8000px',
             filter: hovered 
               ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
               : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
