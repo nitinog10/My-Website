@@ -190,54 +190,145 @@ const ContactSection = () => {
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.3 }}
             className="flex flex-col gap-4"
           >
-            {socials.map((social, index) => (
-              <motion.a
-                key={social.label}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-2xl p-4 md:p-5 transition-all duration-300 relative overflow-hidden"
-                style={{
-                  background: 'rgba(17,17,20,0.9)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
-                  textDecoration: 'none'
-                }}
-                whileHover={{
-                  border: `1px solid ${social.color}40`,
-                  boxShadow: `0 8px 32px ${social.color}15`
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: 0.3 + index * 0.08 }}
-              >
-                {/* Icon */}
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
-                  style={{ background: `${social.color}15`, border: `1px solid ${social.color}25` }}
-                >
-                  <social.icon
-                    className="w-5 h-5 transition-all duration-300"
-                    style={{ color: social.color }}
-                  />
-                </div>
+            {socials.map((social, index) => {
+              const SocialCard = () => {
+                const [hovered, setHovered] = useState(false);
+                
+                return (
+                  <motion.a
+                    key={social.label}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onMouseEnter={() => setHovered(true)}
+                    onMouseLeave={() => setHovered(false)}
+                    className="group relative rounded-2xl p-4 md:p-5 transition-all duration-300 overflow-hidden"
+                    style={{
+                      background: 'rgba(17,17,20,0.9)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+                      textDecoration: 'none'
+                    }}
+                    whileHover={{
+                      border: `1px solid ${social.color}40`,
+                      boxShadow: `0 8px 32px ${social.color}15`
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 0.5, delay: 0.3 + index * 0.08 }}
+                  >
+                    {/* Split effect - top half */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `linear-gradient(135deg, ${social.color}10, transparent)`,
+                        clipPath: 'polygon(0 0, 100% 0, 100% 50%, 0 50%)',
+                      }}
+                      animate={hovered ? {
+                        y: -10,
+                        opacity: [0, 1, 0.8],
+                      } : {
+                        y: 0,
+                        opacity: 0,
+                      }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
+                    
+                    {/* Split effect - bottom half */}
+                    <motion.div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        background: `linear-gradient(135deg, transparent, ${social.color}10)`,
+                        clipPath: 'polygon(0 50%, 100% 50%, 100% 100%, 0 100%)',
+                      }}
+                      animate={hovered ? {
+                        y: 10,
+                        opacity: [0, 1, 0.8],
+                      } : {
+                        y: 0,
+                        opacity: 0,
+                      }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    />
 
-                {/* Text */}
-                <div className="flex-1 min-w-0">
-                  <span className="text-xs text-white/30 uppercase tracking-wider block mb-0.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                    {social.label}
-                  </span>
-                  <span className="text-sm text-white/70 group-hover:text-white transition-colors duration-300 truncate block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                    {social.handle}
-                  </span>
-                </div>
+                    {/* Pointing particles */}
+                    {hovered && (
+                      <>
+                        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => (
+                          <motion.div
+                            key={angle}
+                            className="absolute w-1 h-1 rounded-full pointer-events-none"
+                            style={{
+                              backgroundColor: social.color,
+                              left: '50%',
+                              top: '50%',
+                              boxShadow: `0 0 8px ${social.color}`,
+                            }}
+                            initial={{ 
+                              x: '-50%', 
+                              y: '-50%',
+                              scale: 0,
+                              opacity: 0
+                            }}
+                            animate={{
+                              x: `calc(-50% + ${Math.cos((angle * Math.PI) / 180) * 40}px)`,
+                              y: `calc(-50% + ${Math.sin((angle * Math.PI) / 180) * 40}px)`,
+                              scale: [0, 1, 0],
+                              opacity: [0, 1, 0],
+                            }}
+                            transition={{
+                              duration: 0.8,
+                              ease: "easeOut",
+                              delay: i * 0.05
+                            }}
+                          />
+                        ))}
+                      </>
+                    )}
 
-                {/* Arrow */}
-                <svg className="w-4 h-4 text-white/20 group-hover:text-accent transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
-                </svg>
-              </motion.a>
-            ))}
+                    {/* Content */}
+                    <div className="relative z-10 flex items-center gap-4">
+                      {/* Icon */}
+                      <motion.div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-300"
+                        style={{ background: `${social.color}15`, border: `1px solid ${social.color}25` }}
+                        animate={hovered ? { scale: 1.1, rotate: 5 } : { scale: 1, rotate: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <social.icon
+                          className="w-5 h-5 transition-all duration-300"
+                          style={{ color: social.color }}
+                        />
+                      </motion.div>
+
+                      {/* Text */}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-xs text-white/30 uppercase tracking-wider block mb-0.5" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                          {social.label}
+                        </span>
+                        <span className="text-sm text-white/70 group-hover:text-white transition-colors duration-300 truncate block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+                          {social.handle}
+                        </span>
+                      </div>
+
+                      {/* Arrow */}
+                      <motion.svg 
+                        className="w-4 h-4 text-white/20 group-hover:text-accent transition-all duration-300" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                        animate={hovered ? { x: 2, y: -2 } : { x: 0, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 17L17 7M17 7H7M17 7V17" />
+                      </motion.svg>
+                    </div>
+                  </motion.a>
+                );
+              };
+              
+              return <SocialCard key={social.label} />;
+            })}
 
             {/* Resume download */}
             <motion.a
