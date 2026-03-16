@@ -243,12 +243,158 @@ const ExperienceCard = ({ exp, index, onExpand }: any) => {
   );
 };
 
+const ExperienceDetail = ({ exp, onClose }: any) => {
+  const IconComponent = exp.icon;
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl" />
+      
+      {/* Modal */}
+      <motion.div
+        className="relative max-w-4xl w-full max-h-[90vh] overflow-y-auto bg-gradient-to-br from-black/95 to-gray-900/95 rounded-3xl border-2 p-8 md:p-12 backdrop-blur-md"
+        style={{ borderColor: `${exp.color}40` }}
+        initial={{ scale: 0.9, y: 50 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 50 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10"
+        >
+          <X className="w-6 h-6 text-white" />
+        </button>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-start gap-6 mb-6">
+            <div 
+              className="w-24 h-24 rounded-3xl flex items-center justify-center flex-shrink-0"
+              style={{ 
+                backgroundColor: `${exp.color}20`,
+                border: `3px solid ${exp.color}`,
+                boxShadow: `0 0 40px ${exp.color}40`
+              }}
+            >
+              <IconComponent className="w-12 h-12" style={{ color: exp.color }} />
+            </div>
+            
+            <div className="flex-1">
+              <div 
+                className="inline-block px-4 py-2 rounded-full mb-3"
+                style={{ 
+                  backgroundColor: `${exp.color}30`, 
+                  border: `1px solid ${exp.color}`
+                }}
+              >
+                <span className="text-sm font-bold uppercase tracking-wider" style={{ color: exp.color }}>
+                  {exp.period}
+                </span>
+              </div>
+              
+              <h2 className="text-5xl font-black uppercase tracking-tight text-white mb-3 leading-tight">
+                {exp.role}
+              </h2>
+              <p className="text-2xl font-semibold mb-4" style={{ color: exp.color }}>
+                @ {exp.company}
+              </p>
+            </div>
+          </div>
+
+          <p className="text-lg text-white/80 leading-relaxed">
+            {exp.description}
+          </p>
+        </div>
+
+        {/* Key Achievements */}
+        <div className="mb-8">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-white/50 mb-4">
+            Key Achievements
+          </h3>
+          <div className="space-y-3">
+            {exp.achievements.map((achievement: string, i: number) => (
+              <motion.div
+                key={i}
+                className="flex items-start gap-3 p-4 rounded-xl bg-white/5 border border-white/10"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <div 
+                  className="w-2 h-2 rounded-full mt-2 flex-shrink-0"
+                  style={{ backgroundColor: exp.color }}
+                />
+                <p className="text-white/80 leading-relaxed">{achievement}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Technologies */}
+        <div className="mb-8">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-white/50 mb-4">
+            Technologies & Skills
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {exp.technologies.map((tech: string, i: number) => (
+              <motion.span
+                key={tech}
+                className="px-4 py-2 rounded-xl text-sm font-semibold"
+                style={{
+                  backgroundColor: `${exp.color}20`,
+                  border: `1px solid ${exp.color}40`,
+                  color: exp.color
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.05 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                {tech}
+              </motion.span>
+            ))}
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div>
+          <h3 className="text-sm font-bold uppercase tracking-wider text-white/50 mb-4">
+            Categories
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {exp.tags.map((tag: string) => (
+              <span
+                key={tag}
+                className="px-3 py-2 rounded-lg bg-white/10 border border-white/20 text-white/80 text-sm"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
 const ExperienceJourney = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const pathRef = useRef<SVGPathElement>(null);
+  const isInView = useInView(containerRef, { once: false, margin: '-20%' });
+  const [selectedExp, setSelectedExp] = useState<any>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
   
-  const x = useTransform(scrollYProgress, [0, 1], ['0%', '-80%']);
+  const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   useEffect(() => {
     if (!scrollRef.current || !containerRef.current) return;
