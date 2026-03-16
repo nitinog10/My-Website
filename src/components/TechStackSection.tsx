@@ -37,9 +37,36 @@ const technologies = [
 
 const TechCard = ({ tech, index }: any) => {
   const [hovered, setHovered] = useState(false);
+  const [bubbles, setBubbles] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const IconComponent = tech.icon;
   const cardRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(cardRef, { once: false, margin: "-100px" });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    
+    const rect = card.getBoundingClientRect();
+
+    // Create bubbles randomly
+    if (Math.random() > 0.6) {
+      const newBubble = {
+        id: Date.now() + Math.random(),
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      };
+      setBubbles(prev => [...prev, newBubble]);
+      
+      // Remove bubble after animation
+      setTimeout(() => {
+        setBubbles(prev => prev.filter(b => b.id !== newBubble.id));
+      }, 1200);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+  };
 
   return (
     <motion.div
@@ -48,13 +75,11 @@ const TechCard = ({ tech, index }: any) => {
         opacity: 0, 
         scale: 0.5, 
         rotateY: -180,
-        z: -200 
       }}
       animate={isInView ? { 
         opacity: 1, 
         scale: 1, 
         rotateY: 0,
-        z: 0,
         transition: {
           duration: 0.8,
           delay: index * 0.08,
@@ -70,65 +95,45 @@ const TechCard = ({ tech, index }: any) => {
         opacity: 0, 
         scale: 0.5, 
         rotateY: -180,
-        z: -200,
         transition: {
           duration: 0.5,
           ease: [0.25, 0.46, 0.45, 0.94]
         }
       }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="group relative"
-      style={{ 
-        transformStyle: 'preserve-3d', 
-        perspective: 1000,
-        transformOrigin: 'center center'
-      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative cursor-pointer"
     >
-      <motion.div
-        className="relative bg-black/20 backdrop-blur-sm border border-white/5 rounded-xl p-8 overflow-hidden cursor-pointer group"
-        style={{
-          background: hovered 
-            ? `linear-gradient(135deg, ${tech.color}08, transparent)` 
-            : 'rgba(0,0,0,0.2)',
-        }}
-        whileHover={{ 
-          scale: 1.05,
-          y: -5,
-          borderColor: tech.color + '40',
-          transition: {
-            type: "spring",
-            stiffness: 400,
-            damping: 25
-          }
-        }}
-        whileTap={{ 
-          scale: 0.98,
-          transition: { duration: 0.1 }
-        }}
-      >
-        {/* Simple glow on hover */}
-        <motion.div
-          className="absolute inset-0 opacity-0"
-          style={{
-            background: `radial-gradient(circle at 50% 0%, ${tech.color}15, transparent 60%)`,
-          }}
-          animate={hovered ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        />
+      <div className="relative p-4 overflow-visible">
+        {/* Bubbles */}
+        {bubbles.map(bubble => (
+          <motion.div
+            key={bubble.id}
+            className="absolute w-2 h-2 rounded-full pointer-events-none z-50"
+            style={{
+              left: bubble.x,
+              top: bubble.y,
+              backgroundColor: tech.color,
+              boxShadow: `0 0 15px ${tech.color}`,
+            }}
+            initial={{ scale: 0, opacity: 1 }}
+            animate={{
+              scale: [0, 1.5, 0],
+              y: [0, -80],
+              x: [0, (Math.random() - 0.5) * 40],
+              opacity: [1, 0.8, 0],
+            }}
+            transition={{ duration: 1.2, ease: "easeOut" }}
+          />
+        ))}
 
         {/* Icon */}
         <motion.div
-          className="relative z-10 flex flex-col items-center gap-4"
-          animate={hovered ? { 
-            y: -8,
-            transition: {
-              type: "spring",
-              stiffness: 400,
-              damping: 17
-            }
-          } : { 
-            y: 0,
+          className="flex flex-col items-center gap-2"
+          whileHover={{ 
+            scale: 1.15,
+            y: -5,
             transition: {
               type: "spring",
               stiffness: 400,
@@ -138,128 +143,44 @@ const TechCard = ({ tech, index }: any) => {
         >
           <motion.div
             animate={hovered ? { 
-              rotate: [0, -10, 10, -10, 0],
-              scale: 1.15,
+              rotate: [0, -8, 8, -8, 0],
               transition: {
-                rotate: {
-                  duration: 0.5,
-                  ease: "easeInOut"
-                },
-                scale: {
-                  type: "spring",
-                  stiffness: 300,
-                  damping: 15
-                }
+                duration: 0.5,
+                ease: "easeInOut"
               }
             } : { 
-              rotate: 0, 
-              scale: 1,
-              transition: {
-                type: "spring",
-                stiffness: 300,
-                damping: 20
-              }
+              rotate: 0
             }}
           >
             <IconComponent
               className="w-12 h-12 md:w-14 md:h-14"
               style={{
-                color: hovered ? tech.color : '#ffffff',
+                color: hovered ? tech.color : '#888888',
                 filter: hovered 
                   ? `drop-shadow(0 0 20px ${tech.color})` 
-                  : 'drop-shadow(0 0 8px rgba(255,255,255,0.3))',
+                  : 'none',
                 transition: 'all 0.3s ease',
               }}
             />
           </motion.div>
 
-          <div className="text-center">
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-1">
-              {tech.name}
-            </h3>
-            <p 
-              className="text-[10px] uppercase tracking-widest font-medium"
-              style={{ color: hovered ? tech.color : '#666' }}
+          {/* Tooltip on hover */}
+          {hovered && (
+            <motion.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute top-full mt-2 whitespace-nowrap pointer-events-none z-50"
             >
-              {tech.category}
-            </p>
-          </div>
+              <div className="px-3 py-1.5 rounded-lg bg-black/90 backdrop-blur-md border border-white/10">
+                <p className="text-xs font-bold text-white">{tech.name}</p>
+                <p className="text-[10px] uppercase tracking-wider" style={{ color: tech.color }}>
+                  {tech.category}
+                </p>
+              </div>
+            </motion.div>
+          )}
         </motion.div>
-
-        {/* Bottom accent line */}
-        <motion.div
-          className="absolute bottom-0 left-0 h-1 rounded-full"
-          style={{ backgroundColor: tech.color }}
-          initial={{ width: 0, x: 0 }}
-          animate={hovered ? { 
-            width: '100%',
-            transition: {
-              duration: 0.5,
-              ease: [0.65, 0, 0.35, 1]
-            }
-          } : { 
-            width: 0,
-            transition: {
-              duration: 0.4,
-              ease: [0.65, 0, 0.35, 1]
-            }
-          }}
-        />
-        
-        {/* Particle effect on hover */}
-        {hovered && (
-          <>
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-              style={{ backgroundColor: tech.color }}
-              initial={{ scale: 0, x: '-50%', y: '-50%' }}
-              animate={{
-                scale: [0, 1, 0],
-                x: ['-50%', '-150%', '-250%'],
-                y: ['-50%', '-150%', '-250%'],
-                opacity: [0, 1, 0]
-              }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-            />
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-              style={{ backgroundColor: tech.color }}
-              initial={{ scale: 0, x: '-50%', y: '-50%' }}
-              animate={{
-                scale: [0, 1, 0],
-                x: ['-50%', '50%', '150%'],
-                y: ['-50%', '-150%', '-250%'],
-                opacity: [0, 1, 0]
-              }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            />
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-              style={{ backgroundColor: tech.color }}
-              initial={{ scale: 0, x: '-50%', y: '-50%' }}
-              animate={{
-                scale: [0, 1, 0],
-                x: ['-50%', '-150%', '-250%'],
-                y: ['-50%', '50%', '150%'],
-                opacity: [0, 1, 0]
-              }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            />
-            <motion.div
-              className="absolute top-1/2 left-1/2 w-2 h-2 rounded-full"
-              style={{ backgroundColor: tech.color }}
-              initial={{ scale: 0, x: '-50%', y: '-50%' }}
-              animate={{
-                scale: [0, 1, 0],
-                x: ['-50%', '50%', '150%'],
-                y: ['-50%', '50%', '150%'],
-                opacity: [0, 1, 0]
-              }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: 0.3 }}
-            />
-          </>
-        )}
-      </motion.div>
+      </div>
     </motion.div>
   );
 };
