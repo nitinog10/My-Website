@@ -6,8 +6,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import RedesignDemo from "./pages/RedesignDemo";
-import ControlCenter from "./pages/ControlCenter";
 import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -49,8 +47,6 @@ const App = () => {
           <PageWrapper>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/redesign" element={<RedesignDemo />} />
-              <Route path="/control-center" element={<ControlCenter />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </PageWrapper>

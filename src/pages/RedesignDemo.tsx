@@ -119,8 +119,6 @@ const RedesignDemo = () => {
           </motion.div>
         </div>
       </section>
-      
-      <DesignToggle />
     </main>
   );
 };
