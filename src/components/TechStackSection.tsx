@@ -366,10 +366,10 @@ const TechIcon = ({ tech, index, isInView }: any) => {
         <IconComponent
           className="w-12 h-12 md:w-14 md:h-14 transition-all duration-300"
           style={{
-            color: (isHovered || isActive) ? '#22d3ee' : tech.color,
+            color: (isHovered || isActive) ? '#22d3ee' : '#666666',
             filter: (isHovered || isActive)
               ? 'drop-shadow(0 0 16px rgba(34, 211, 238, 0.8)) drop-shadow(0 0 32px rgba(34, 211, 238, 0.4))' 
-              : `drop-shadow(0 0 8px ${tech.color}60)`,
+              : 'drop-shadow(0 0 8px rgba(102, 102, 102, 0.3))',
           }}
         />
       </motion.div>
