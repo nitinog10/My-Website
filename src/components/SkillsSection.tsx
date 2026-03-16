@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Brain, Code, Layers, Zap, Database, Cloud, Sparkles, Cpu } from 'lucide-react';
+import { Brain, Code, Layers, Database, Cloud, Sparkles, Zap, Cpu } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,100 +12,99 @@ const skillCategories = [
     title: 'AI & Machine Learning',
     icon: Brain,
     color: '#FF6B6B',
+    gradient: 'from-red-500 to-pink-500',
     skills: [
       'Generative AI (LLMs, RAG)',
-      'Computer Vision',
-      'NLP & Fine-Tuning',
+      'Computer Vision & Object Detection',
+      'NLP & Model Fine-Tuning',
       'Multi-Agent Systems',
       'PyTorch & TensorFlow',
       'Transformers & Keras'
-    ],
-    position: { x: 15, y: 20 }
+    ]
   },
   {
     id: 'fullstack',
     title: 'Full-Stack Development',
     icon: Code,
     color: '#4ECDC4',
+    gradient: 'from-cyan-500 to-teal-500',
     skills: [
       'React & Next.js',
       'Node.js & FastAPI',
-      'TypeScript',
+      'TypeScript & JavaScript',
       'Tailwind CSS',
       'GSAP Animations',
       'Three.js & 3D Web'
-    ],
-    position: { x: 75, y: 25 }
+    ]
   },
   {
     id: 'architecture',
     title: 'System Architecture',
     icon: Layers,
     color: '#45B7D1',
+    gradient: 'from-blue-500 to-indigo-500',
     skills: [
       'Scalable AI Systems',
-      'Microservices',
-      'API Design',
+      'Microservices Design',
+      'RESTful & GraphQL APIs',
       'MCP Servers',
       'Cloud-Native Apps',
       'CI/CD Pipelines'
-    ],
-    position: { x: 85, y: 70 }
+    ]
   },
   {
     id: 'data',
     title: 'Data Engineering',
     icon: Database,
     color: '#95E1D3',
+    gradient: 'from-emerald-500 to-green-500',
     skills: [
       'Pandas & NumPy',
       'Data Pipelines',
-      'MongoDB',
-      'PostgreSQL',
+      'MongoDB & PostgreSQL',
       'Vector Databases',
-      'ETL Processes'
-    ],
-    position: { x: 20, y: 75 }
+      'ETL Processes',
+      'Data Visualization'
+    ]
   },
   {
     id: 'cloud',
     title: 'Cloud & DevOps',
     icon: Cloud,
     color: '#FFA502',
+    gradient: 'from-orange-500 to-amber-500',
     skills: [
-      'AWS & GCP',
+      'AWS & Google Cloud',
       'Docker & Kubernetes',
-      'Serverless',
+      'Serverless Architecture',
       'Infrastructure as Code',
       'Monitoring & Logging',
       'Git & Version Control'
-    ],
-    position: { x: 50, y: 50 }
+    ]
   }
 ];
 
-const SkillNode = ({ category, index, onHover, activeNode }: any) => {
-  const nodeRef = useRef<HTMLDivElement>(null);
+const SkillCard = ({ category, index, isInView }: any) => {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const IconComponent = category.icon;
-  const isActive = activeNode === category.id;
 
   useEffect(() => {
-    if (!nodeRef.current) return;
+    if (!cardRef.current) return;
 
     gsap.fromTo(
-      nodeRef.current,
-      { opacity: 0, scale: 0, rotate: -180 },
+      cardRef.current,
+      { opacity: 0, y: 60, rotateX: -15 },
       {
         opacity: 1,
-        scale: 1,
-        rotate: 0,
+        y: 0,
+        rotateX: 0,
         duration: 0.8,
         delay: index * 0.15,
-        ease: 'back.out(1.7)',
+        ease: 'power3.out',
         scrollTrigger: {
-          trigger: nodeRef.current.closest('section'),
-          start: 'top 70%',
+          trigger: cardRef.current,
+          start: 'top 80%',
           toggleActions: 'play none none reverse',
         },
       }
@@ -114,265 +113,178 @@ const SkillNode = ({ category, index, onHover, activeNode }: any) => {
 
   return (
     <motion.div
-      ref={nodeRef}
-      className="absolute cursor-pointer group"
-      style={{
-        left: `${category.position.x}%`,
-        top: `${category.position.y}%`,
-        transform: 'translate(-50%, -50%)',
-      }}
-      onHoverStart={() => {
-        setIsHovered(true);
-        onHover(category.id);
-      }}
-      onHoverEnd={() => {
-        setIsHovered(false);
-        onHover(null);
-      }}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.95 }}
+      ref={cardRef}
+      className="group relative"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3 }}
     >
-      {/* Outer pulse ring */}
-      <motion.div
-        className="absolute inset-0 rounded-full"
+      <div
+        className="relative p-8 rounded-3xl overflow-hidden transition-all duration-500"
         style={{
-          width: '120px',
-          height: '120px',
-          border: `2px solid ${category.color}`,
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-        animate={{
-          scale: isActive ? [1, 1.3, 1] : 1,
-          opacity: isActive ? [0.5, 0, 0.5] : 0.3,
-        }}
-        transition={{ duration: 2, repeat: Infinity }}
-      />
-
-      {/* Main node */}
-      <motion.div
-        className="relative w-24 h-24 rounded-full flex items-center justify-center"
-        style={{
-          background: `radial-gradient(circle at 30% 30%, ${category.color}40, ${category.color}20)`,
-          border: `2px solid ${category.color}`,
-          boxShadow: isActive 
-            ? `0 0 40px ${category.color}80, inset 0 0 20px ${category.color}40`
-            : `0 0 20px ${category.color}40`,
-        }}
-        animate={{
-          boxShadow: isActive
-            ? `0 0 40px ${category.color}80, inset 0 0 20px ${category.color}40`
-            : `0 0 20px ${category.color}40`,
+          background: isHovered 
+            ? `linear-gradient(135deg, ${category.color}15, rgba(0,0,0,0.8))`
+            : 'rgba(17, 17, 20, 0.6)',
+          border: isHovered 
+            ? `2px solid ${category.color}60`
+            : '1px solid rgba(255,255,255,0.08)',
+          boxShadow: isHovered 
+            ? `0 20px 60px ${category.color}30, 0 0 80px ${category.color}20`
+            : '0 4px 20px rgba(0,0,0,0.3)',
         }}
       >
-        <IconComponent 
-          className="w-10 h-10 transition-all duration-300"
-          style={{ 
-            color: category.color,
-            filter: `drop-shadow(0 0 8px ${category.color})`,
-          }} 
+        {/* Top gradient line */}
+        <div 
+          className="absolute top-0 left-0 right-0 h-1"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${category.color}, transparent)`,
+            opacity: isHovered ? 1 : 0.3,
+            transition: 'opacity 0.3s',
+          }}
         />
-      </motion.div>
 
-      {/* Label */}
-      <motion.div
-        className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 + index * 0.15 }}
-      >
-        <p 
-          className="text-xs font-bold text-center uppercase tracking-wider"
-          style={{ color: category.color }}
-        >
-          {category.title}
-        </p>
-      </motion.div>
-
-      {/* Skills panel on hover */}
-      <AnimatePresence>
-        {isHovered && (
+        {/* Icon and Title */}
+        <div className="flex items-start gap-6 mb-6">
           <motion.div
-            className="absolute top-full mt-8 left-1/2 -translate-x-1/2 w-72 z-50 pointer-events-none"
-            initial={{ opacity: 0, y: -20, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            transition={{ duration: 0.3 }}
+            className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center"
+            style={{
+              background: `linear-gradient(135deg, ${category.color}30, ${category.color}10)`,
+              border: `1px solid ${category.color}40`,
+            }}
+            animate={isHovered ? { rotate: 360 } : { rotate: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <div 
-              className="p-6 rounded-2xl backdrop-blur-xl"
-              style={{
-                background: 'rgba(10, 10, 10, 0.95)',
-                border: `2px solid ${category.color}60`,
-                boxShadow: `0 8px 32px ${category.color}30, 0 0 60px ${category.color}20`,
+            <IconComponent 
+              className="w-8 h-8"
+              style={{ 
+                color: category.color,
+                filter: `drop-shadow(0 0 8px ${category.color}60)`,
               }}
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                >
-                  <IconComponent className="w-6 h-6" style={{ color: category.color }} />
-                </motion.div>
-                <h4 className="text-sm font-bold text-white uppercase tracking-tight">
-                  {category.title}
-                </h4>
-              </div>
-              <div className="space-y-2.5">
-                {category.skills.map((skill: string, i: number) => (
-                  <motion.div
-                    key={skill}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="flex items-start gap-2.5"
-                  >
-                    <motion.div 
-                      className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
-                      style={{ backgroundColor: category.color }}
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity, delay: i * 0.2 }}
-                    />
-                    <span className="text-sm text-white/80 leading-relaxed">{skill}</span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
-const ConnectionLines = ({ activeNode }: any) => {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-      <defs>
-        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FF6B6B" stopOpacity="0.3" />
-          <stop offset="50%" stopColor="#4ECDC4" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#FFA502" stopOpacity="0.3" />
-        </linearGradient>
-      </defs>
-      {skillCategories.map((cat1, i) => 
-        skillCategories.slice(i + 1).map((cat2) => {
-          const isActive = activeNode === cat1.id || activeNode === cat2.id;
-          return (
-            <motion.line
-              key={`${cat1.id}-${cat2.id}`}
-              x1={`${cat1.position.x}%`}
-              y1={`${cat1.position.y}%`}
-              x2={`${cat2.position.x}%`}
-              y2={`${cat2.position.y}%`}
-              stroke="url(#lineGradient)"
-              strokeWidth={isActive ? "2" : "1"}
-              strokeDasharray="5,5"
-              initial={{ pathLength: 0, opacity: 0 }}
-              animate={{ 
-                pathLength: 1, 
-                opacity: isActive ? 0.6 : 0.2,
-              }}
-              transition={{ duration: 1.5, delay: i * 0.1 }}
             />
-          );
-        })
-      )}
-    </svg>
+          </motion.div>
+
+          <div className="flex-1">
+            <h3 
+              className="text-2xl font-black uppercase tracking-tight mb-2"
+              style={{ color: isHovered ? category.color : '#fff' }}
+            >
+              {category.title}
+            </h3>
+            <div className="flex items-center gap-2">
+              <div 
+                className="h-px flex-1"
+                style={{ 
+                  background: `linear-gradient(90deg, ${category.color}60, transparent)`,
+                }}
+              />
+              <span className="text-xs text-white/40 uppercase tracking-wider">
+                {category.skills.length} Skills
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Skills Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {category.skills.map((skill: string, i: number) => (
+            <motion.div
+              key={skill}
+              className="flex items-center gap-3 p-3 rounded-xl transition-all duration-300"
+              style={{
+                background: isHovered ? `${category.color}08` : 'transparent',
+                border: `1px solid ${isHovered ? category.color + '20' : 'transparent'}`,
+              }}
+              initial={{ opacity: 0, x: -20 }}
+              animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+              transition={{ delay: 0.5 + index * 0.15 + i * 0.05 }}
+            >
+              <motion.div
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: category.color }}
+                animate={isHovered ? { scale: [1, 1.5, 1] } : { scale: 1 }}
+                transition={{ duration: 1, repeat: isHovered ? Infinity : 0 }}
+              />
+              <span className="text-sm text-white/70 group-hover:text-white/90 transition-colors">
+                {skill}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Hover glow effect */}
+        <motion.div
+          className="absolute inset-0 rounded-3xl pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at 50% 0%, ${category.color}20, transparent 70%)`,
+            opacity: isHovered ? 1 : 0,
+          }}
+          transition={{ duration: 0.3 }}
+        />
+
+        {/* Corner accent */}
+        <div 
+          className="absolute bottom-4 right-4 w-12 h-12 rounded-full opacity-20"
+          style={{
+            background: `radial-gradient(circle, ${category.color}, transparent)`,
+            filter: 'blur(20px)',
+          }}
+        />
+      </div>
+    </motion.div>
   );
 };
 
 const SkillsSection = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: false, margin: '-20%' });
-  const [activeNode, setActiveNode] = useState<string | null>(null);
 
   return (
     <section ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden bg-black">
-      {/* Animated background */}
-      <div className="absolute inset-0 bg-gradient-radial from-accent/5 via-transparent to-transparent opacity-50" />
-      
-      {/* Floating particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-accent/30"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+      {/* Background effects */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* Header */}
         <motion.div
-          className="mb-20"
+          className="mb-16"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.8 }}
         >
-          <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold mb-4 block">
-            002 — SKILL CONSTELLATION
-          </span>
-          <h2 className="text-[clamp(3rem, 10vw, 8rem)] font-black uppercase tracking-tighter leading-[0.85] text-white">
+          <div className="flex items-center gap-4 mb-6">
+            <span className="text-xs tracking-[0.3em] text-accent uppercase font-bold">
+              002 — CAPABILITIES
+            </span>
+            <div className="h-px flex-1 bg-gradient-to-r from-accent/30 to-transparent" />
+          </div>
+          
+          <h2 className="text-[clamp(3rem, 10vw, 8rem)] font-black uppercase tracking-tighter leading-[0.85] text-white mb-6">
             WHAT I<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-500">
               WORK WITH
             </span>
           </h2>
-          <p className="text-white/60 mt-6 max-w-2xl text-lg">
-            Hover over nodes to explore skills in each domain
+
+          <p className="text-white/60 text-lg max-w-2xl">
+            A comprehensive breakdown of my technical expertise across AI, development, and infrastructure.
           </p>
         </motion.div>
 
-        {/* Skill Constellation */}
-        <motion.div
-          className="relative h-[600px] rounded-3xl overflow-hidden border border-white/10 bg-black/50 backdrop-blur-sm"
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
-          transition={{ duration: 1 }}
-        >
-          {/* Connection lines */}
-          <ConnectionLines activeNode={activeNode} />
-
-          {/* Skill nodes */}
+        {/* Skills Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {skillCategories.map((category, index) => (
-            <SkillNode
+            <SkillCard
               key={category.id}
               category={category}
               index={index}
-              onHover={setActiveNode}
-              activeNode={activeNode}
+              isInView={isInView}
             />
           ))}
-
-          {/* Center glow */}
-          <motion.div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full"
-            style={{
-              background: 'radial-gradient(circle, rgba(0,255,200,0.1), transparent)',
-              filter: 'blur(40px)',
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-        </motion.div>
+        </div>
       </div>
     </section>
   );
