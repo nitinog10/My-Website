@@ -51,7 +51,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
       {/* Icon only - no sphere */}
       <Html
         center
-        distanceFactor={0.015}
+        distanceFactor={1.5}
         position={[0, 0, 0]}
         style={{
           transition: 'all 0.3s ease',
@@ -61,7 +61,7 @@ const TechNode = ({ tech, position, onHover }: any) => {
         <IconComponent 
           style={{ 
             color: hovered ? tech.color : '#ffffff', 
-            fontSize: hovered ? '16000px' : '15000px',
+            fontSize: hovered ? '80px' : '70px',
             filter: hovered 
               ? `drop-shadow(0 0 30px ${tech.color}) drop-shadow(0 0 60px ${tech.color})` 
               : 'drop-shadow(0 0 12px rgba(255,255,255,0.8))',
@@ -117,21 +117,21 @@ const SkillNeuralNetwork = () => {
     const orbit3 = technologies.slice(16);
     
     return [
-      { techs: orbit1, radius: 4, speed: 0.15, tilt: 0.3 },
-      { techs: orbit2, radius: 6.5, speed: -0.12, tilt: -0.2 },
-      { techs: orbit3, radius: 9, speed: 0.1, tilt: 0.4 },
+      { techs: orbit1, radius: 3, speed: 0.15, tilt: 0.3 },
+      { techs: orbit2, radius: 5, speed: -0.12, tilt: -0.2 },
+      { techs: orbit3, radius: 7, speed: 0.1, tilt: 0.4 },
     ];
   }, []);
 
   return (
     <div className="relative w-full h-[700px] bg-black/40 rounded-3xl overflow-hidden border border-white/5">
       <Canvas>
-        <PerspectiveCamera makeDefault position={[0, 4, 10]} fov={60} />
+        <PerspectiveCamera makeDefault position={[0, 3, 8]} fov={70} />
         <OrbitControls 
           enableZoom={true}
           autoRotate={false}
-          minDistance={6}
-          maxDistance={18}
+          minDistance={5}
+          maxDistance={15}
           enablePan={false}
           maxPolarAngle={Math.PI / 1.6}
           minPolarAngle={Math.PI / 4}
@@ -156,7 +156,7 @@ const SkillNeuralNetwork = () => {
         
         {/* Central core */}
         <mesh>
-          <sphereGeometry args={[1.2, 32, 32]} />
+          <sphereGeometry args={[0.8, 32, 32]} />
           <meshStandardMaterial
             color="#00ffc8"
             emissive="#00ffc8"
