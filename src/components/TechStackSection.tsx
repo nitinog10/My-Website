@@ -342,6 +342,7 @@ const TechIcon = ({ tech, index, isInView }: any) => {
         transition={{ duration: 0.3 }}
         style={{
           background: (isHovered || isActive) ? 'rgba(34, 211, 238, 0.5)' : 'transparent',
+          visibility: (isHovered || isActive) ? 'visible' : 'hidden',
         }}
       />
 
