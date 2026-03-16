@@ -246,32 +246,64 @@ const ConnectionLines = ({ techs }: any) => {
   );
 };
 
-const Scene = ({ onTechHover }: any) => {
+const Scene = ({ onTechHover, onTechClick }: any) => {
+  const groupRef = useRef<THREE.Group>(null!);
+  
+  useFrame((state) => {
+    // Subtle rotation of entire network
+    if (groupRef.current) {
+      groupRef.current.rotation.y = Math.sin(state.clock.getElapsedTime() * 0.1) * 0.1;
+    }
+  });
+
   return (
-    <>
-      <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-      <ambientLight intensity={0.5} />
-      <pointLight position={[10, 10, 10]} intensity={1} color="#00ffc8" />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#ff6b6b" />
+    <group ref={groupRef}>
+      <OrbitControls 
+        enableZoom={true} 
+        autoRotate 
+        autoRotateSpeed={0.3}
+        minDistance={5}
+        maxDistance={15}
+      />
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} color="#00ffc8" />
+      <pointLight position={[-10, -10, -10]} intensity={0.8} color="#ff6b6b" />
+      <spotLight position={[0, 10, 0]} angle={0.3} intensity={1} color="#ffffff" />
       
       <ConnectionLines techs={techStack} />
       
       {techStack.map((tech, i) => (
-        <TechNode key={tech.name} tech={tech} index={i} onHover={onTechHover} />
+        <TechNode 
+          key={tech.name} 
+          tech={tech} 
+          index={i} 
+          onHover={onTechHover}
+          onClick={onTechClick}
+        />
       ))}
       
-      {/* Central core */}
-      <Sphere args={[0.5, 32, 32]} position={[0, 0, 0]}>
+      {/* Central core with particles */}
+      <Sphere args={[0.8, 32, 32]} position={[0, 0, 0]}>
         <meshStandardMaterial
           color="#00ffc8"
           emissive="#00ffc8"
-          emissiveIntensity={0.5}
+          emissiveIntensity={0.3}
           transparent
-          opacity={0.2}
+          opacity={0.1}
           wireframe
         />
       </Sphere>
-    </>
+      
+      {/* Outer sphere */}
+      <Sphere args={[4, 32, 32]} position={[0, 0, 0]}>
+        <meshBasicMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.02}
+          wireframe
+        />
+      </Sphere>
+    </group>
   );
 };
 
