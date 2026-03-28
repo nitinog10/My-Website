@@ -24,8 +24,8 @@ const recognitions = [
     size: 'medium'
   },
   { 
-    title: '3 HACKATHON WINS', 
-    category: 'WINS',
+    title: '4 HACKATHON WINS', 
+    category: 'Wins',
     year: '2024-25',
     description: 'Multiple hackathon victories showcasing expertise in AI, full-stack development, and problem-solving.',
     image: '/abc.jpeg',
@@ -37,7 +37,7 @@ const recognitions = [
     title: 'NATIONAL LEVEL IDEATHON', 
     category: 'WINNER',
     year: '2024',
-    description: 'First place at national ideathon for developing innovative tech solutions addressing real-world challenges.',
+    description: 'First place at national ideathon for developing innovative tech solutions addressing real-world challenge in esports',
     image: '/national level ideathon.jpeg',
     icon: Zap,
     color: '#60d5f0',
