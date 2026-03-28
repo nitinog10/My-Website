@@ -4,6 +4,7 @@ import MagneticCursor from '@/components/MagneticCursor';
 import NoiseOverlay from '@/components/NoiseOverlay';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import ScrollProgress from '@/components/ScrollProgress';
+import ScrollyCanvas from '@/components/ScrollyCanvas';
 import HeroSection from '@/components/HeroSection';
 import IntroSection from '@/components/IntroSection';
 import SkillsSection from '@/components/SkillsSection';
@@ -25,6 +26,9 @@ const Index = () => {
       {/* Custom viewfinder cursor */}
       <MagneticCursor />
 
+      {/* Scrolly Canvas Entry Animation */}
+      <ScrollyCanvas />
+      
       {/* Animated abstract background */}
       <AnimatedBackground />
       
