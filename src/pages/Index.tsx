@@ -9,7 +9,6 @@ import HeroSection from '@/components/HeroSection';
 import IntroSection from '@/components/IntroSection';
 import SkillsSection from '@/components/SkillsSection';
 import ProjectsSection from '@/components/ProjectsSection';
-import ExperienceSection from '@/components/ExperienceSection';
 import TechStackSection from '@/components/TechStackSection';
 import RecognitionSection from '@/components/RecognitionSection';
 import ContactSection from '@/components/ContactSection';
@@ -57,7 +56,6 @@ const Index = () => {
           
           <SkillsSection />
           <ProjectsSection />
-          <ExperienceSection />
           <RecognitionSection />
         </div>
         
