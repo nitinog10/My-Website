@@ -113,12 +113,6 @@ export default function ScrollyCanvas() {
 
                 {/* Bottom Fade Gradient */}
                 <div className="absolute bottom-0 left-0 w-full h-[50vh] bg-gradient-to-t from-[#0a0a0b] via-[#0a0a0b]/80 to-transparent pointer-events-none z-20" />
-
-                {!isLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-[#0a0a0b] z-50 text-white font-mono text-sm tracking-widest">
-                        LOADING EXPERIENCE...
-                    </div>
-                )}
             </div>
         </div>
     );
