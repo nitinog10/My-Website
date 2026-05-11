@@ -26,7 +26,7 @@ const IntroSection = () => {
   return (
     <motion.section 
       ref={ref} 
-      className="section-full bg-background/20 backdrop-blur-sm py-20 md:py-48 overflow-hidden"
+      className="section-full bg-black py-20 md:py-48 overflow-hidden"
       style={{ opacity, scale }}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-12">

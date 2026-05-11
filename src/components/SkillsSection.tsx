@@ -269,7 +269,7 @@ const SkillsSection = () => {
   const isInView = useInView(ref, { once: false, margin: "-10%" });
 
   return (
-    <section ref={ref} className="min-h-screen py-32 md:py-48 overflow-hidden">
+    <section ref={ref} className="min-h-screen py-32 md:py-48 overflow-hidden bg-black">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
         {/* Section header */}
         <div className="grid grid-cols-12 gap-4 mb-20">

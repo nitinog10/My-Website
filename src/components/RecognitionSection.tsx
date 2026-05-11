@@ -294,7 +294,7 @@ const RecognitionSection = () => {
   const isInView = useInView(sectionRef, { once: false, margin: "-10%" });
 
   return (
-    <section ref={sectionRef} className="min-h-screen py-32 md:py-48 overflow-hidden bg-[#0a0a0b] relative">
+    <section ref={sectionRef} className="min-h-screen py-32 md:py-48 overflow-hidden bg-black relative">
       {/* Background effects */}
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-500/5 blur-[150px] rounded-full pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-500/5 blur-[150px] rounded-full pointer-events-none" />

@@ -1,6 +1,5 @@
-import { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
-import gsap from "gsap";
+import { useRef, useState } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, 
   Github, 
@@ -8,17 +7,28 @@ import {
   Cpu, 
   Navigation, 
   BookOpen, 
-  Compass, 
-  ChevronRight, 
-  ChevronLeft 
+  Compass,
+  Loader2
 } from "lucide-react";
 
+/** Array of projects with corrected image paths */
 const projects = [
   {
     id: "01",
+    name: "DocuverseAI",
+    description: "AI reads your code like a senior engineer, narrates every file with audio, and generates interactive architecture maps. Understand any codebase in minutes.",
+    stack: ["React", "AWS", "Python"],
+    image: "/Docuverse.png",
+    github: "https://github.com/nitinog10/logorhythms.git",
+    theme: "#8B5CF6",
+    category: "",
+    icon: BookOpen
+  },
+  {
+    id: "02",
     name: "ATMOPREDICT",
-    description: "NASA Space Apps Challenge winning project. A complex predictive model utilizing historical climate data to forecast environmental shifts and potential climate anomalies with high-fidelity visualization mapping.",
-    stack: ["ML", "Python", "Satellite Data"],
+    description: "NASA Space Apps Challenge winning project. A complex predictive model utilizing historical climate data to forecast environmental shifts and potential climate anomalies.",
+    stack: ["ML", "Python", "Satellite Map"],
     image: "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=1200",
     github: "https://github.com/nitinog10/AtmoPredict.git",
     theme: "#0EA5E9",
@@ -26,9 +36,9 @@ const projects = [
     icon: Compass
   },
   {
-    id: "02",
+    id: "03",
     name: "AIRPULSE",
-    description: "Real-time national AQI analysis ecosystem. Features advanced predictive modeling for air quality fluctuations across major Indian urban centers with interactive spatial data maps.",
+    description: "Real-time national AQI analysis ecosystem. Features advanced predictive modeling for air quality fluctuations across major Indian urban centers.",
     stack: ["Streamlit", "ML", "Analytics"],
     image: "/airpulse.png",
     github: "https://github.com/nitinog10/air-pulse.git",
@@ -37,9 +47,9 @@ const projects = [
     icon: Cpu
   },
   {
-    id: "03",
+    id: "04",
     name: "CAMPUS MITRA",
-    description: "Enterprise-grade RAG-powered AI ecosystem for institutional assistance. Orchestrates multiple LLM agents to provide complex query resolution based on specific campus knowledge bases.",
+    description: "Enterprise-grade RAG-powered AI ecosystem for institutional assistance. Orchestrates multiple LLM agents to provide complex campus query resolution.",
     stack: ["LLMs", "RAG", "Python"],
     image: "/campusmitra.png",
     github: "https://github.com/nitinog10/Campus-mitra.git",
@@ -48,9 +58,9 @@ const projects = [
     icon: Layers
   },
   {
-    id: "04",
+    id: "05",
     name: "BHARATTRIPAI",
-    description: "Intelligent sovereign travel assistant tailored for the Indian landscape. Uses NLP to facilitate deep cultural discovery through personalized itineraries and semantic discovery of hidden locations.",
+    description: "Intelligent sovereign travel assistant tailored for the Indian landscape. Uses NLP to facilitate deep cultural discovery through personalized itineraries.",
     stack: ["NLP", "Travel AI", "FastAPI"],
     image: "/Bharattripai.png",
     github: "https://github.com/nitinog10/Beta-20-.git",
@@ -59,11 +69,11 @@ const projects = [
     icon: Navigation
   },
   {
-    id: "05",
+    id: "06",
     name: "FOUNDATION LMS",
-    description: "Scalable modern architecture for large-scale educational management. Focuses on modular design patterns, reactive UI, and backend efficiency for high-concurrency learning environments.",
+    description: "Scalable modern architecture for large-scale educational management. Focuses on modular design patterns, reactive UI, and backend efficiency.",
     stack: ["React", "Architecture", "Convex"],
-    image: "/learning management system.png",
+    image: "/learning%20management%20system.png",
     github: "https://github.com/nitinog10/Learning-management-system.git",
     theme: "#8B5CF6",
     category: "SYSTEMS DESIGN",
@@ -71,163 +81,173 @@ const projects = [
   }
 ];
 
-const ProjectCaseStudy = ({ project, active }: { project: typeof projects[0], active: boolean }) => {
-  const container = useRef<HTMLDivElement>(null);
-  
+const ProjectCard = ({ project, index }: { project: typeof projects[0], index: number }) => {
+  const [imageStatus, setImageStatus] = useState<'loading' | 'loaded' | 'error'>('loading');
+
   return (
-    <motion.div
-      ref={container}
-      className={`absolute inset-0 w-full h-full p-4 md:p-12 lg:p-24 flex items-center justify-center transition-all duration-1000 ${
-        active ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none scale-95"
-      }`}
-    >
-      <div className="grid grid-cols-12 gap-12 max-w-7xl w-full">
-        {/* Visual Showcase */}
-        <div className="col-span-12 lg:col-span-7 relative h-[300px] md:h-[500px] rounded-[30px] md:rounded-[60px] overflow-hidden group border border-white/5 shadow-2xl">
-           <motion.img 
+    <div className="w-screen h-full flex items-center justify-center p-4 md:p-12 relative group shrink-0">
+      
+      {/* Clean card container with full rectangular image */}
+      <div className="relative w-full max-w-[90vw] md:max-w-6xl h-auto md:h-[65vh] flex flex-col md:flex-row bg-black/95 backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl transition-all duration-500 hover:border-white/20 hover:shadow-[0_0_60px_rgba(255,255,255,0.1)]">
+        
+        {/* Left Side: Full Rectangular Image */}
+        <div className="w-full md:w-[50%] h-[300px] md:h-full relative overflow-hidden bg-black">
+           <AnimatePresence>
+              {imageStatus === 'loading' && (
+                <motion.div 
+                  exit={{ opacity: 0 }} 
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-black z-30"
+                >
+                  <Loader2 className="w-6 h-6 text-white/30 animate-spin mb-3" />
+                  <span className="text-[10px] uppercase tracking-[0.3em] font-mono text-white/30">Loading</span>
+                </motion.div>
+              )}
+           </AnimatePresence>
+           
+           <img 
               src={project.image} 
               alt={project.name}
-              className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-           />
-           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-           
-           <div className="absolute top-8 left-8 flex items-center gap-3">
-              <div className="p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10">
-                <project.icon className="w-6 h-6 text-white" />
-              </div>
-           </div>
-
-           <div className="absolute bottom-8 right-8">
-              <a 
-                href={project.github} 
-                target="_blank" 
-                className="flex items-center gap-2 p-5 rounded-full bg-accent text-black font-black hover:scale-110 transition-transform shadow-[0_0_30px_rgba(0,255,200,0.4)]"
-              >
-                  <ArrowUpRight className="w-6 h-6" />
-              </a>
-           </div>
+              onLoad={() => setImageStatus('loaded')}
+              onError={() => setImageStatus('error')}
+              className={`w-full h-full object-contain transition-all duration-700 ease-out
+                ${imageStatus === 'loaded' ? 'scale-100 opacity-100' : 'scale-110 opacity-0'}
+                group-hover:scale-105
+              `}
+            />
+            
+            {/* Subtle overlay for depth */}
+            <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-black/40 pointer-events-none" />
+            
+            {/* Accent border on hover */}
+            <div 
+               className="absolute bottom-0 left-0 w-full h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+               style={{ backgroundColor: project.theme }}
+            />
         </div>
 
-        {/* Text Storytelling */}
-        <div className="col-span-12 lg:col-span-5 flex flex-col justify-center">
-           <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={active ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-           >
-              <span className="text-accent text-[10px] md:text-xs font-black tracking-[0.6em] uppercase mb-1">{project.category}</span>
-              <h2 className="text-5xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tighter leading-none mb-4 md:mb-8 group">
-                {project.name}
-              </h2>
-              
-              <p className="text-white/40 text-sm md:text-md leading-relaxed mb-8 border-l-2 border-accent/20 pl-6">
-                 {project.description}
-              </p>
+        {/* Right Side: Content */}
+        <div className="w-full md:w-[50%] h-full p-8 md:p-12 flex flex-col justify-center relative bg-black">
+          
+          {/* Category Badge */}
+          {project.category && (
+            <div className="flex items-center gap-3 mb-6">
+               <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/5 border border-white/10">
+                 <project.icon className="w-4 h-4" style={{ color: project.theme }} />
+               </div>
+               <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/60">
+                 {project.category}
+               </span>
+            </div>
+          )}
+          
+          {/* Project Number */}
+          <div className="text-sm font-mono text-white/30 mb-3">
+            {project.id}
+          </div>
+          
+          {/* Project Name */}
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white uppercase tracking-tight leading-[0.95] mb-6 transition-all duration-300 group-hover:text-white/90">
+             {project.name}
+          </h2>
 
-              <div className="flex flex-wrap gap-2 mb-12">
-                  {project.stack.map(s => (
-                    <span key={s} className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-[9px] md:text-[10px] font-bold text-white/50 tracking-widest uppercase">
-                       {s}
-                    </span>
-                  ))}
-              </div>
+          {/* Description */}
+          <p className="text-white/60 text-sm md:text-base leading-relaxed mb-8 transition-colors duration-300 group-hover:text-white/80">
+             {project.description}
+          </p>
+          
+          {/* Tech Stack */}
+          <div className="flex flex-wrap gap-2 mb-8">
+             {project.stack.map((s) => (
+               <span 
+                 key={s} 
+                 className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-[11px] font-semibold text-white/70 tracking-wide uppercase transition-all hover:bg-white/10 hover:border-white/20"
+               >
+                  {s}
+               </span>
+             ))}
+          </div>
 
-              <div className="flex items-center gap-8">
-                <a 
-                    href={project.github} 
-                    target="_blank" 
-                    className="flex items-center gap-4 group"
-                >
-                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:border-white transition-all">
-                        <Github className="w-5 h-5 group-hover:text-black transition-colors" />
-                    </div>
-                    <span className="text-[10px] text-white/20 uppercase tracking-[0.4em] font-bold group-hover:text-white transition-colors">
-                        Source Code
-                    </span>
-                </a>
-              </div>
-           </motion.div>
+          {/* Action Buttons */}
+          <div className="flex items-center gap-4 mt-auto">
+             <a 
+               href={project.github} 
+               target="_blank"
+               rel="noreferrer"
+               className="group/btn flex items-center gap-3 bg-white text-black px-6 py-3 rounded-full font-bold text-xs uppercase tracking-wider hover:scale-105 transition-all shadow-lg hover:shadow-xl"
+             >
+                View Project
+                <ArrowUpRight className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+             </a>
+             <a 
+               href={project.github} 
+               target="_blank"
+               rel="noreferrer"
+               className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all hover:scale-110 text-white/70 hover:text-white"
+             >
+                <Github className="w-5 h-5" />
+             </a>
+          </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 const ProjectsSection = () => {
-  const [index, setIndex] = useState(0);
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const isInView = useInView(sectionRef, { once: false, margin: "-10%" });
+  const targetRef = useRef<HTMLDivElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: targetRef,
+    offset: ["start start", "end end"]
+  });
 
-  const next = () => setIndex((i) => (i + 1) % projects.length);
-  const prev = () => setIndex((i) => (i === 0 ? projects.length - 1 : i - 1));
+  // 6 projects = 600vw width. 
+  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-83.33%"]);
+  
+  // Keep heading visible during scroll
+  const headingOpacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [1, 1, 1, 0.3]);
 
   return (
-    <section ref={sectionRef} id="projects" className="relative min-h-screen bg-[#050505] overflow-hidden">
-      {/* Dynamic Background */}
-      <div 
-        className="absolute inset-0 opacity-10 blur-[120px] transition-all duration-1000 scale-125 pointer-events-none"
-        style={{ background: `radial-gradient(circle at 70% 30%, ${projects[index].theme}, transparent)` }}
-      />
+    <section ref={targetRef} id="projects" className="relative h-[600vh] bg-black">
+      
+      {/* Sticky Scroll Area */}
+      <div className="sticky top-0 flex flex-col justify-center h-screen overflow-hidden">
+        
+        {/* Section Heading */}
+        <motion.div 
+          style={{ opacity: headingOpacity }}
+          className="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center"
+        >
+          <div className="flex items-center justify-center gap-4 mb-3">
+            <span className="text-[10px] md:text-sm tracking-[0.5em] text-accent font-bold uppercase py-1 border-b border-accent/30">003 | PORTFOLIO</span>
+          </div>
+          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white uppercase tracking-tighter leading-none">
+            PROJECTS
+          </h2>
+          <div className="w-20 h-0.5 bg-accent/40 mx-auto rounded-full mt-3" />
+        </motion.div>
 
-      {/* Hero Header Context */}
-      <div className="absolute top-12 left-12 flex items-center gap-12 z-20 pointer-events-none opacity-20">
-         <span className="text-[10px] font-black text-white tracking-[1em] uppercase">M-STORY_004</span>
-         <div className="h-px w-24 bg-white/30" />
-         <span className="text-[10px] font-bold text-white uppercase tracking-[0.5em]">FEAT_SELECTED_WORKS</span>
-      </div>
-
-      {/* Progress Sidebar */}
-      <div className="absolute right-12 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-6">
+        {/* Horizontal Track */}
+        <motion.div style={{ x }} className="flex w-[600vw] relative z-10 items-center">
           {projects.map((p, i) => (
-             <div 
-                key={p.id}
-                onClick={() => setIndex(i)}
-                className={`w-1 transition-all duration-500 cursor-pointer ${i === index ? "h-12 bg-accent" : "h-4 bg-white/10 hover:bg-white/30"}`}
-             />
+             <ProjectCard key={p.id} project={p} index={i} />
           ))}
-          <span className="text-white/20 text-[10px] font-black mt-4 vertical-text font-mono">
-             {String(index + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
-          </span>
+        </motion.div>
+
+        {/* Global Progress Indicator for the Container */}
+        <div className="absolute bottom-8 lg:bottom-12 left-1/2 -translate-x-1/2 w-48 md:w-64 h-1 bg-white/[0.05] rounded-full z-20 overflow-hidden">
+          <motion.div 
+             className="h-full bg-white relative"
+             style={{ 
+               scaleX: scrollYProgress, 
+               transformOrigin: "left",
+               boxShadow: "0 0 10px rgba(255, 255, 255, 0.4)" 
+             }} 
+          />
+        </div>
+        
       </div>
-
-      {/* Main Content Areas */}
-      <div className="relative w-full h-full min-h-screen flex items-center justify-center">
-         <AnimatePresence mode="wait">
-            {projects.map((p, i) => (
-                <ProjectCaseStudy key={p.id} project={p} active={i === index} />
-            ))}
-         </AnimatePresence>
-      </div>
-
-      {/* Dynamic Navigation Controls */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex items-center gap-24 z-20">
-         <button 
-            onClick={prev}
-            className="group flex flex-col items-center gap-4 transition-all hover:-translate-x-2"
-         >
-             <div className="w-16 h-16 rounded-full border border-white/5 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-[0_0_30px_rgba(0,255,200,0.1)] transition-all">
-                <ChevronLeft className="w-5 h-5 text-white/20 group-hover:text-accent" />
-             </div>
-             <span className="text-[8px] text-white/10 uppercase tracking-[0.4em] font-black group-hover:text-white transition-colors">Previous_P</span>
-         </button>
-
-         <button 
-            onClick={next}
-            className="group flex flex-col items-center gap-4 transition-all hover:translate-x-2"
-         >
-             <div className="w-16 h-16 rounded-full border border-white/5 flex items-center justify-center group-hover:border-accent/30 group-hover:shadow-[0_0_30px_rgba(0,255,200,0.1)] transition-all">
-                <ChevronRight className="w-5 h-5 text-white/20 group-hover:text-accent" />
-             </div>
-             <span className="text-[8px] text-white/10 uppercase tracking-[0.4em] font-black group-hover:text-white transition-colors">Next_P</span>
-         </button>
-      </div>
-
-      <style>{`
-        .vertical-text {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-        }
-      `}</style>
+      
     </section>
   );
 };

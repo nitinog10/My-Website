@@ -61,7 +61,7 @@ const ContactSection = () => {
   return (
     <motion.section
       ref={ref}
-      className="py-32 md:py-48 overflow-hidden"
+      className="py-32 md:py-48 overflow-hidden bg-black"
       style={{ opacity }}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-12">

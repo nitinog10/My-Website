@@ -107,8 +107,12 @@ export default function ScrollyCanvas() {
                 <Overlay scrollYProgress={scrollYProgress} />
 
                 {/* Fixed Logo */}
-                <div className="absolute top-8 left-8 z-50 mix-blend-difference pointer-events-none">
-                    <span className="font-bold text-3xl tracking-tighter text-white">NM</span>
+                <div className="absolute top-6 left-6 md:top-8 md:left-8 z-50 mix-blend-screen pointer-events-none">
+                    <img 
+                      src="/bat-logo.png" 
+                      alt="XevosVault Logo" 
+                      className="w-20 md:w-28 h-auto object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] brightness-[3] contrast-200" 
+                    />
                 </div>
 
                 {/* Bottom Fade Gradient */}
