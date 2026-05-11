@@ -6,9 +6,10 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import LoadingScreen from "./components/LoadingScreen";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,6 +34,7 @@ const PageWrapper = ({ children }: { children: React.ReactNode }) => {
 };
 
 const App = () => {
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     // Global GSAP Refresh on route change
     ScrollTrigger.refresh();
@@ -41,6 +43,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        {isLoading && <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />}
         <Toaster />
         <Sonner />
         <BrowserRouter>
