@@ -174,30 +174,14 @@ const ExperienceCard = ({ exp, index }: { exp: typeof experiences[0], index: num
 };
 
 const ExperienceSection = () => {
-  const targetRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end end"]
-  });
-
-  // 6 experiences = 600vw width - REVERSE DIRECTION (left to right)
-  const x = useTransform(scrollYProgress, [0, 1], ["-83.33%", "0%"]);
-  
-  // Keep heading visible during scroll
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [1, 1, 1, 0.3]);
-
   return (
-    <section ref={targetRef} id="experience" className="relative h-[600vh] bg-black">
+    <section id="experience" className="relative min-h-screen bg-black py-16 md:py-24">
       
-      {/* Sticky Scroll Area */}
-      <div className="sticky top-0 flex flex-col justify-center h-screen overflow-hidden">
+      {/* Container */}
+      <div className="flex flex-col justify-center h-full overflow-hidden">
         
         {/* Section Heading */}
-        <motion.div 
-          style={{ opacity: headingOpacity }}
-          className="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center"
-        >
+        <div className="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center">
           <div className="flex items-center justify-center gap-4 mb-3">
             <span className="text-[10px] md:text-sm tracking-[0.5em] text-accent font-bold uppercase py-1 border-b border-accent/30">004 | JOURNEY</span>
           </div>
@@ -205,26 +189,25 @@ const ExperienceSection = () => {
             EXPERIENCE
           </h2>
           <div className="w-20 h-0.5 bg-accent/40 mx-auto rounded-full mt-3" />
-        </motion.div>
+        </div>
 
-        {/* Horizontal Track - Starting from right, moving to left */}
-        <motion.div style={{ x }} className="flex w-[600vw] relative z-10 items-center justify-end">
-          {experiences.map((exp, i) => (
-             <ExperienceCard key={i} exp={exp} index={i} />
+        {/* Horizontal Track - Auto-scrolling infinite loop (Left to Right) */}
+        <motion.div 
+          className="flex w-[1200vw] relative z-10 items-center mt-12 md:mt-16"
+          animate={{
+            x: ["-50%", "0%"]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
+          {/* Duplicate experiences for infinite loop effect */}
+          {[...experiences, ...experiences].map((exp, i) => (
+             <ExperienceCard key={`exp-${i}`} exp={exp} index={i % experiences.length} />
           ))}
         </motion.div>
-
-        {/* Global Progress Indicator */}
-        <div className="absolute bottom-8 lg:bottom-12 left-1/2 -translate-x-1/2 w-48 md:w-64 h-1 bg-white/[0.05] rounded-full z-20 overflow-hidden">
-          <motion.div 
-             className="h-full bg-white relative"
-             style={{ 
-               scaleX: scrollYProgress, 
-               transformOrigin: "left",
-               boxShadow: "0 0 10px rgba(0, 255, 200, 0.4)" 
-             }} 
-          />
-        </div>
         
       </div>
       

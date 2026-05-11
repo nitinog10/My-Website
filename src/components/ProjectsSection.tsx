@@ -194,30 +194,14 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0], index: n
 };
 
 const ProjectsSection = () => {
-  const targetRef = useRef<HTMLDivElement>(null);
-  
-  const { scrollYProgress } = useScroll({
-    target: targetRef,
-    offset: ["start start", "end end"]
-  });
-
-  // 6 projects = 600vw width. 
-  const x = useTransform(scrollYProgress, [0, 1], ["0%", "-83.33%"]);
-  
-  // Keep heading visible during scroll
-  const headingOpacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [1, 1, 1, 0.3]);
-
   return (
-    <section ref={targetRef} id="projects" className="relative h-[600vh] bg-black">
+    <section id="projects" className="relative min-h-screen bg-black py-16 md:py-24">
       
-      {/* Sticky Scroll Area */}
-      <div className="sticky top-0 flex flex-col justify-center h-screen overflow-hidden">
+      {/* Container */}
+      <div className="flex flex-col justify-center h-full overflow-hidden">
         
         {/* Section Heading */}
-        <motion.div 
-          style={{ opacity: headingOpacity }}
-          className="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center"
-        >
+        <div className="absolute top-8 md:top-12 left-1/2 -translate-x-1/2 z-30 text-center">
           <div className="flex items-center justify-center gap-4 mb-3">
             <span className="text-[10px] md:text-sm tracking-[0.5em] text-accent font-bold uppercase py-1 border-b border-accent/30">003 | PORTFOLIO</span>
           </div>
@@ -225,26 +209,25 @@ const ProjectsSection = () => {
             PROJECTS
           </h2>
           <div className="w-20 h-0.5 bg-accent/40 mx-auto rounded-full mt-3" />
-        </motion.div>
+        </div>
 
-        {/* Horizontal Track */}
-        <motion.div style={{ x }} className="flex w-[600vw] relative z-10 items-center">
-          {projects.map((p, i) => (
-             <ProjectCard key={p.id} project={p} index={i} />
+        {/* Horizontal Track - Auto-scrolling infinite loop (Right to Left) */}
+        <motion.div 
+          className="flex w-[1200vw] relative z-10 items-center mt-12 md:mt-16"
+          animate={{
+            x: ["0%", "-50%"]
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+        >
+          {/* Duplicate projects for infinite loop effect */}
+          {[...projects, ...projects].map((p, i) => (
+             <ProjectCard key={`project-${i}`} project={p} index={i % projects.length} />
           ))}
         </motion.div>
-
-        {/* Global Progress Indicator for the Container */}
-        <div className="absolute bottom-8 lg:bottom-12 left-1/2 -translate-x-1/2 w-48 md:w-64 h-1 bg-white/[0.05] rounded-full z-20 overflow-hidden">
-          <motion.div 
-             className="h-full bg-white relative"
-             style={{ 
-               scaleX: scrollYProgress, 
-               transformOrigin: "left",
-               boxShadow: "0 0 10px rgba(255, 255, 255, 0.4)" 
-             }} 
-          />
-        </div>
         
       </div>
       
