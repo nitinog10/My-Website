@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence, useAnimation } from "framer-motion";
 import { 
   ArrowUpRight, 
   Github, 
@@ -194,6 +194,8 @@ const ProjectCard = ({ project, index }: { project: typeof projects[0], index: n
 };
 
 const ProjectsSection = () => {
+  const [isPaused, setIsPaused] = useState(false);
+
   return (
     <section id="projects" className="relative min-h-screen bg-black py-16 md:py-24">
       
@@ -212,22 +214,37 @@ const ProjectsSection = () => {
         </div>
 
         {/* Horizontal Track - Auto-scrolling infinite loop (Right to Left) */}
-        <motion.div 
+        <div 
           className="flex w-[1200vw] relative z-10 items-center mt-12 md:mt-16"
-          animate={{
-            x: ["0%", "-50%"]
+          style={{
+            animation: 'scrollLeft 20s linear infinite',
+            animationPlayState: isPaused ? 'paused' : 'running'
           }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setIsPaused(false)}
         >
           {/* Duplicate projects for infinite loop effect */}
           {[...projects, ...projects].map((p, i) => (
-             <ProjectCard key={`project-${i}`} project={p} index={i % projects.length} />
+             <ProjectCard 
+               key={`project-${i}`} 
+               project={p} 
+               index={i % projects.length}
+             />
           ))}
-        </motion.div>
+        </div>
+        
+        <style>{`
+          @keyframes scrollLeft {
+            from {
+              transform: translateX(0%);
+            }
+            to {
+              transform: translateX(-50%);
+            }
+          }
+        `}</style>
         
       </div>
       

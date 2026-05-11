@@ -198,9 +198,10 @@ const ExperienceSection = () => {
             x: ["-50%", "0%"]
           }}
           transition={{
-            duration: 20,
+            duration: 25,
             repeat: Infinity,
-            ease: "linear"
+            ease: "linear",
+            repeatType: "loop"
           }}
         >
           {/* Duplicate experiences for infinite loop effect */}
