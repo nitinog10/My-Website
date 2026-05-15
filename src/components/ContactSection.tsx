@@ -7,8 +7,8 @@ const socials = [
   {
     icon: SiLinkedin,
     label: 'LinkedIn',
-    handle: 'nitin-kumar-mishra',
-    href: 'https://www.linkedin.com/in/nitin-kumar-mishra-520615331',
+    handle: 'nitin-k-mishra',
+    href: 'https://www.linkedin.com/in/nitin-k-mishra-520615331',
     color: '#0A66C2'
   },
   {

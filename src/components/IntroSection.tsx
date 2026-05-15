@@ -170,7 +170,7 @@ const IntroSection = () => {
             >
               <div className="hidden md:block w-12 h-px bg-gradient-to-r from-accent to-transparent"></div>
               <a
-                href="https://www.linkedin.com/in/nitin-kumar-mishra-520615331"
+                href="https://www.linkedin.com/in/nitin-k-mishra-520615331"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs tracking-[0.2em] text-muted-foreground/60 hover:text-accent transition-colors duration-300 uppercase flex items-center gap-2 group"
